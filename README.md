@@ -1,55 +1,70 @@
 # PawsNClaws ATX
 
-**A 501(c)(3) nonprofit platform helping Austin's animals**
+**A community resource hub helping Austin's animals**
 
-## Mission
+## What This Is
 
-PawsNClaws ATX coordinates community efforts to help local animals - stray cats, dogs, rescues, and community colonies. We connect volunteers, track animals being helped, manage donations, and provide resources to the Austin pet community.
+A simple website connecting Austin residents with resources to help local animals:
 
-## Features
-
-- **Animal Tracking** - Profiles for strays, fosters, and adoptable animals
-- **Volunteer Coordination** - Feeding routes, foster network, event volunteers
-- **Donation System** - One-time, recurring, and sponsor-a-stray programs
-- **Resource Directory** - Low-cost vet services, food banks, TNR info
-- **Events** - Adoption events, fundraisers, community workshops
-- **Impact Dashboard** - Transparent reporting of where donations go
+- **Resource Directory** - Low-cost vets, pet food assistance, TNR programs, emergency services
+- **Ways to Help** - Links to volunteer, foster, donate, and adopt
+- **Information** - About community cats, local shelters, and how to help strays
 
 ## Tech Stack
 
-- **Backend:** FastAPI (Python)
-- **Database:** Supabase (PostgreSQL)
-- **Payments:** Stripe (donations)
-- **Email:** SendGrid
-- **SMS:** Twilio
+- **Framework:** Next.js 16 (App Router)
+- **Styling:** Tailwind CSS
+- **Hosting:** Vercel (planned)
 
 ## Getting Started
 
 ```bash
-# Clone the repo
-git clone https://github.com/pawsnclaws-atx/pawsnclaws-atx.git
-cd pawsnclaws-atx
-
-# Install dependencies
-cd packages/api
-pip install -r requirements.txt
-
-# Set up environment
-cp .env.example .env
-# Edit .env with your credentials
-
-# Run the API
-uvicorn app.main:app --reload
+cd apps/web
+npm install
+npm run dev
 ```
 
-## Contributing
+Visit http://localhost:3000
 
-We welcome volunteers! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+## Project Structure
+
+```
+pawsnclaws-atx/
+  apps/
+    web/                  # Next.js site
+      src/
+        app/              # Pages (home, resources, get-involved, about)
+        components/       # Shared components
+        data/             # Content as TypeScript (easy to edit)
+  docs/                   # Documentation
+```
+
+## Updating Content
+
+All content lives in `apps/web/src/data/`:
+
+- `resources.ts` - Austin-area resources (vets, shelters, etc.)
+- `ways-to-help.ts` - Volunteer/donate/foster information
+- `site-config.ts` - Site-wide configuration
+
+Just edit these files - no database needed.
+
+## Deployment
+
+```bash
+cd apps/web
+npm run build   # Creates static export
+```
+
+Deploy the `apps/web/.next` folder to any static host (Vercel, Netlify, GitHub Pages).
+
+## Future Ideas
+
+- Contact form (probably Formspree)
+- Lost & found board
+- Volunteer coordination features
+- Community cat colony map
 
 ## License
 
-This project is open source under the MIT License.
-
----
-
-*Every feature asks: "Does this help more animals?"*
+MIT
