@@ -15,8 +15,11 @@ export const siteConfig = {
   // Navigation
   nav: [
     { label: "Home", href: "/" },
+    { label: "Donate", href: "/donate" },
+    { label: "Campaigns", href: "/campaigns" },
+    { label: "Map", href: "/map" },
     { label: "Resources", href: "/resources" },
-    { label: "Get Involved", href: "/get-involved" },
+    { label: "Impact", href: "/impact" },
     { label: "About", href: "/about" },
   ],
 
