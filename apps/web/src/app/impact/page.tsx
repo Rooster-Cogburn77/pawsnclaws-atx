@@ -1,46 +1,9 @@
-import { HeartIcon, UsersIcon, HomeIcon } from "@/components/Icons";
+import Link from "next/link";
 
-// Demo metrics - will come from Supabase
-const metrics = {
-  animals_helped: 847,
-  tnr_count: 312,
-  adoptions: 89,
-  surrenders_prevented: 43,
-  meals_provided: 15420,
-  vet_bills_paid: 2847500, // in cents = $28,475
-  deposits_assisted: 12,
-  volunteers_active: 67,
-  colonies_managed: 14,
+export const metadata = {
+  title: "Our Impact | PawsNClaws ATX",
+  description: "Learn about the impact PawsNClaws ATX is making for Austin's animals.",
 };
-
-const recentDonations = [
-  { name: "Sarah M.", amount: 5000, message: "For the cats!", time: "2 hours ago" },
-  { name: "Anonymous", amount: 10000, message: null, time: "5 hours ago" },
-  { name: "Austin Pet Co.", amount: 50000, message: "Monthly sponsorship", time: "1 day ago" },
-  { name: "Jake T.", amount: 2500, message: "In memory of Whiskers", time: "2 days ago" },
-  { name: "Maria G.", amount: 1500, message: null, time: "3 days ago" },
-];
-
-const recentUpdates = [
-  {
-    title: "Luna's Surgery Success!",
-    content: "Luna's leg surgery was a success! She's recovering well and will be ready for adoption in 3 weeks.",
-    date: "Jan 20, 2026",
-    type: "campaign",
-  },
-  {
-    title: "New Colony Stabilized",
-    content: "The East Riverside colony is now 100% TNR'd. All 18 cats are healthy and have dedicated feeders.",
-    date: "Jan 15, 2026",
-    type: "colony",
-  },
-  {
-    title: "Surrender Prevented",
-    content: "Thanks to our deposit assistance program, the Martinez family gets to keep their dog Max.",
-    date: "Jan 12, 2026",
-    type: "prevention",
-  },
-];
 
 export default function ImpactPage() {
   return (
@@ -48,176 +11,109 @@ export default function ImpactPage() {
       {/* Hero */}
       <section className="px-4 py-16 text-center">
         <div className="max-w-3xl mx-auto">
+          <span className="text-5xl mb-4 block">📊</span>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Your Impact in Action
+            Our Impact
           </h1>
           <p className="text-xl text-gray-600">
-            Every dollar you donate goes directly to helping Austin&apos;s animals.
-            Here&apos;s exactly where your generosity is making a difference.
+            At PawsNClaws ATX, we&apos;re committed to transparency.
+            This page will display real-time impact data once our programs are fully operational.
           </p>
         </div>
       </section>
 
-      {/* Big Numbers */}
+      {/* Coming Soon Notice */}
       <section className="px-4 pb-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <StatCard
-              value={metrics.animals_helped}
-              label="Animals Helped"
-              emoji="🐾"
-            />
-            <StatCard
-              value={metrics.tnr_count}
-              label="Cats TNR'd"
-              emoji="✂️"
-            />
-            <StatCard
-              value={metrics.adoptions}
-              label="Adoptions"
-              emoji="🏠"
-            />
-            <StatCard
-              value={metrics.surrenders_prevented}
-              label="Surrenders Prevented"
-              emoji="💕"
-            />
-            <StatCard
-              value={metrics.colonies_managed}
-              label="Colonies Managed"
-              emoji="🗺️"
-            />
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
+            <span className="text-4xl mb-4 block">🚧</span>
+            <h2 className="text-xl font-bold text-blue-900 mb-3">
+              Impact Dashboard Coming Soon
+            </h2>
+            <p className="text-blue-800 mb-6">
+              We&apos;re building a real-time dashboard that will show verified statistics
+              from our programs. Check back soon to see the difference your support makes.
+            </p>
+            <p className="text-sm text-blue-700">
+              Want to be notified when this page is live?{" "}
+              <Link href="/contact" className="underline font-medium">
+                Contact us
+              </Link>{" "}
+              to join our mailing list.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Financial Transparency */}
+      {/* What We Do */}
       <section className="px-4 pb-16">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Where Your Money Goes
+            Our Programs
           </h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="text-3xl mb-3">🏥</div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">
-                ${(metrics.vet_bills_paid / 100).toLocaleString()}
-              </div>
-              <div className="text-gray-600">Emergency Vet Care</div>
-              <div className="text-sm text-gray-500 mt-2">
-                Surgeries, treatments, and medical care for animals in need
-              </div>
+              <span className="text-3xl mb-3 block">🏠</span>
+              <h3 className="font-bold text-gray-900 mb-2">Pet Deposit Assistance</h3>
+              <p className="text-gray-600 text-sm">
+                We help families cover pet deposits when moving to new housing,
+                preventing surrenders due to financial barriers.
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="text-3xl mb-3">🥫</div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">
-                {metrics.meals_provided.toLocaleString()}
-              </div>
-              <div className="text-gray-600">Meals Provided</div>
-              <div className="text-sm text-gray-500 mt-2">
-                Feeding community cats and pets of families in need
-              </div>
+              <span className="text-3xl mb-3 block">🏥</span>
+              <h3 className="font-bold text-gray-900 mb-2">Emergency Vet Fund</h3>
+              <p className="text-gray-600 text-sm">
+                Our vet fund helps families facing unexpected veterinary emergencies
+                who might otherwise have to surrender their pets.
+              </p>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="text-3xl mb-3">🏠</div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">
-                {metrics.deposits_assisted}
-              </div>
-              <div className="text-gray-600">Pet Deposits Paid</div>
-              <div className="text-sm text-gray-500 mt-2">
-                Helping families keep their pets when moving
-              </div>
+              <span className="text-3xl mb-3 block">✂️</span>
+              <h3 className="font-bold text-gray-900 mb-2">TNR Support</h3>
+              <p className="text-gray-600 text-sm">
+                We support Trap-Neuter-Return efforts for community cats,
+                helping manage colonies humanely and effectively.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <span className="text-3xl mb-3 block">💕</span>
+              <h3 className="font-bold text-gray-900 mb-2">Surrender Prevention</h3>
+              <p className="text-gray-600 text-sm">
+                We connect families with resources to keep their pets at home,
+                addressing the root causes of surrender.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Two Column: Recent Donations + Updates */}
+      {/* Transparency Commitment */}
       <section className="px-4 pb-16">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
-          {/* Recent Donations */}
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <HeartIcon className="w-5 h-5 text-red-500" />
-              Recent Donations
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-8">
+            <h2 className="text-xl font-bold text-amber-900 mb-4 text-center">
+              Our Transparency Commitment
             </h2>
-            <div className="bg-white rounded-xl shadow-md divide-y">
-              {recentDonations.map((donation, i) => (
-                <div key={i} className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <span className="font-medium text-gray-900">
-                        {donation.name}
-                      </span>
-                      <span className="text-amber-600 ml-2">
-                        ${(donation.amount / 100).toFixed(0)}
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-500">{donation.time}</span>
-                  </div>
-                  {donation.message && (
-                    <p className="text-sm text-gray-600 mt-1 italic">
-                      &quot;{donation.message}&quot;
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-            <a
-              href="/donate"
-              className="block mt-4 text-center py-3 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition-colors"
-            >
-              Join These Donors
-            </a>
+            <ul className="space-y-3 text-amber-800">
+              <li className="flex items-start gap-3">
+                <span className="text-amber-500 mt-0.5">✓</span>
+                <span>All statistics on this site will be verified and real</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-amber-500 mt-0.5">✓</span>
+                <span>We will publish annual financial reports</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-amber-500 mt-0.5">✓</span>
+                <span>100% of donations go directly to helping animals</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-amber-500 mt-0.5">✓</span>
+                <span>We only share stories with permission from the families involved</span>
+              </li>
+            </ul>
           </div>
-
-          {/* Recent Updates */}
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <UsersIcon className="w-5 h-5 text-blue-500" />
-              Recent Updates
-            </h2>
-            <div className="space-y-4">
-              {recentUpdates.map((update, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-md p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-medium text-gray-900">{update.title}</h3>
-                    <span className="text-xs text-gray-500">{update.date}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">{update.content}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sponsors */}
-      <section className="px-4 pb-16">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Our Sponsors
-          </h2>
-          <p className="text-gray-600 mb-8">
-            These businesses make our work possible
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 items-center opacity-60">
-            {/* Placeholder sponsor logos */}
-            {["Sponsor A", "Sponsor B", "Sponsor C", "Sponsor D"].map((s) => (
-              <div
-                key={s}
-                className="w-32 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-sm"
-              >
-                {s}
-              </div>
-            ))}
-          </div>
-          <a
-            href="/sponsor"
-            className="inline-block mt-8 text-amber-600 hover:text-amber-700 font-medium"
-          >
-            Become a sponsor →
-          </a>
         </div>
       </section>
 
@@ -226,48 +122,28 @@ export default function ImpactPage() {
         <div className="max-w-3xl mx-auto">
           <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-8 text-center text-white">
             <h2 className="text-2xl font-bold mb-4">
-              Ready to Make a Difference?
+              Help Us Make an Impact
             </h2>
             <p className="mb-6 text-amber-100">
-              Every donation, no matter the size, helps save lives.
+              Your support helps Austin&apos;s animals and the families who love them.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
+              <Link
                 href="/donate"
                 className="px-6 py-3 bg-white text-amber-600 font-bold rounded-xl hover:bg-amber-50 transition-colors"
               >
                 Donate Now
-              </a>
-              <a
-                href="/get-involved"
+              </Link>
+              <Link
+                href="/volunteer"
                 className="px-6 py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-colors"
               >
                 Volunteer
-              </a>
+              </Link>
             </div>
           </div>
         </div>
       </section>
-    </div>
-  );
-}
-
-function StatCard({
-  value,
-  label,
-  emoji,
-}: {
-  value: number;
-  label: string;
-  emoji: string;
-}) {
-  return (
-    <div className="bg-white rounded-xl shadow-md p-6 text-center">
-      <div className="text-3xl mb-2">{emoji}</div>
-      <div className="text-3xl font-bold text-gray-900">
-        {value.toLocaleString()}
-      </div>
-      <div className="text-sm text-gray-600">{label}</div>
     </div>
   );
 }

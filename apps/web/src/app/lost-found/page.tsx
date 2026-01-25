@@ -24,74 +24,10 @@ interface Listing {
   created_at: string;
 }
 
-// Demo data - used when Supabase is not connected
-const demoListings: Listing[] = [
-  {
-    id: "1",
-    type: "lost" as const,
-    species: "dog",
-    breed: "Golden Retriever",
-    name: "Buddy",
-    color: "Golden",
-    description: "Friendly, wearing blue collar with tags. Last seen near Zilker Park.",
-    location_last_seen: "Zilker Park, Austin",
-    contact_name: "Sarah",
-    contact_phone: "(512) 555-0123",
-    photos: [],
-    status: "active" as const,
-    created_at: "2026-01-23",
-  },
-  {
-    id: "2",
-    type: "found" as const,
-    species: "cat",
-    breed: "Tabby",
-    name: null,
-    color: "Orange tabby",
-    description: "Very friendly orange cat found wandering. No collar. Appears well-fed.",
-    location_found: "Mueller neighborhood",
-    contact_name: "Mike",
-    contact_email: "mike@example.com",
-    photos: [],
-    status: "active" as const,
-    created_at: "2026-01-22",
-  },
-  {
-    id: "3",
-    type: "lost" as const,
-    species: "cat",
-    breed: "Siamese",
-    name: "Luna",
-    color: "Cream with dark points",
-    description: "Indoor cat, may be scared. Microchipped. Please check garages and sheds.",
-    location_last_seen: "East Austin, near 12th St",
-    contact_name: "Maria",
-    contact_phone: "(512) 555-0456",
-    photos: [],
-    status: "active" as const,
-    created_at: "2026-01-20",
-  },
-  {
-    id: "4",
-    type: "found" as const,
-    species: "dog",
-    breed: "Chihuahua mix",
-    name: null,
-    color: "Brown and white",
-    description: "Small dog found near busy intersection. Safe now. No chip found.",
-    location_found: "S. Lamar & Oltorf",
-    contact_name: "Austin Animal Center",
-    contact_phone: "311",
-    photos: [],
-    status: "active" as const,
-    created_at: "2026-01-19",
-  },
-];
-
 export default function LostFoundPage() {
   const [filter, setFilter] = useState<ListingType>("all");
   const [speciesFilter, setSpeciesFilter] = useState<string>("all");
-  const [listings, setListings] = useState<Listing[]>(demoListings);
+  const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -102,10 +38,8 @@ export default function LostFoundPage() {
         if (data.listings && data.listings.length > 0) {
           setListings(data.listings);
         }
-        // If no listings from API, keep demo data
       } catch (error) {
         console.error("Failed to fetch listings:", error);
-        // Keep demo data on error
       } finally {
         setIsLoading(false);
       }
@@ -136,13 +70,13 @@ export default function LostFoundPage() {
               href="/lost-found/report?type=lost"
               className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors"
             >
-              🔴 Report Lost Pet
+              Report Lost Pet
             </Link>
             <Link
               href="/lost-found/report?type=found"
               className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-colors"
             >
-              🟢 Report Found Pet
+              Report Found Pet
             </Link>
           </div>
         </div>
@@ -154,8 +88,8 @@ export default function LostFoundPage() {
           <div className="flex rounded-lg bg-white shadow p-1">
             {[
               { key: "all", label: "All" },
-              { key: "lost", label: "🔴 Lost" },
-              { key: "found", label: "🟢 Found" },
+              { key: "lost", label: "Lost" },
+              { key: "found", label: "Found" },
             ].map((f) => (
               <button
                 key={f.key}
@@ -173,8 +107,8 @@ export default function LostFoundPage() {
           <div className="flex rounded-lg bg-white shadow p-1">
             {[
               { key: "all", label: "All Pets" },
-              { key: "dog", label: "🐕 Dogs" },
-              { key: "cat", label: "🐈 Cats" },
+              { key: "dog", label: "Dogs" },
+              { key: "cat", label: "Cats" },
             ].map((f) => (
               <button
                 key={f.key}
@@ -201,8 +135,27 @@ export default function LostFoundPage() {
               <p className="text-gray-500 mt-4">Loading listings...</p>
             </div>
           ) : filteredListings.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No listings match your filters.</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
+              <span className="text-4xl mb-4 block">🔍</span>
+              <h3 className="font-bold text-blue-900 mb-2">No Active Listings</h3>
+              <p className="text-blue-800 mb-4">
+                There are currently no active lost or found pet reports.
+                If you&apos;ve lost or found a pet, please submit a report.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/lost-found/report?type=lost"
+                  className="px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Report Lost Pet
+                </Link>
+                <Link
+                  href="/lost-found/report?type=found"
+                  className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Report Found Pet
+                </Link>
+              </div>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
@@ -219,7 +172,7 @@ export default function LostFoundPage() {
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-red-50 rounded-xl p-6">
-              <h3 className="font-bold text-red-900 mb-3">🔴 Lost Your Pet?</h3>
+              <h3 className="font-bold text-red-900 mb-3">Lost Your Pet?</h3>
               <ul className="text-sm text-red-800 space-y-2">
                 <li>• Search your neighborhood immediately - most pets are found nearby</li>
                 <li>• Post on Nextdoor, Facebook groups, and Pawboost</li>
@@ -230,7 +183,7 @@ export default function LostFoundPage() {
               </ul>
             </div>
             <div className="bg-green-50 rounded-xl p-6">
-              <h3 className="font-bold text-green-900 mb-3">🟢 Found a Pet?</h3>
+              <h3 className="font-bold text-green-900 mb-3">Found a Pet?</h3>
               <ul className="text-sm text-green-800 space-y-2">
                 <li>• Check for a collar/tags and call the number</li>
                 <li>• Take to any vet or shelter to scan for microchip (free)</li>
