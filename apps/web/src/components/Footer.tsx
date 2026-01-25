@@ -24,6 +24,7 @@ const footerLinks = {
     { label: "Success Stories", href: "/stories" },
     { label: "Impact", href: "/impact" },
     { label: "About Us", href: "/about" },
+    { label: "FAQ", href: "/faq" },
     { label: "Contact", href: "/contact" },
   ],
 };

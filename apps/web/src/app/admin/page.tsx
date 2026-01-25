@@ -79,6 +79,22 @@ const dashboardItems = [
     count: 0,
     color: "bg-cyan-50 border-cyan-200",
   },
+  {
+    title: "Event Signups",
+    emoji: "📅",
+    href: "/admin/events",
+    description: "View event registrations",
+    count: 0,
+    color: "bg-teal-50 border-teal-200",
+  },
+  {
+    title: "Contact Messages",
+    emoji: "💬",
+    href: "/admin/messages",
+    description: "View and respond to messages",
+    count: 0,
+    color: "bg-orange-50 border-orange-200",
+  },
 ];
 
 export default function AdminDashboard() {
