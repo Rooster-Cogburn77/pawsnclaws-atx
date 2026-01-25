@@ -16,7 +16,7 @@ const footerLinks = {
     { label: "Volunteer", href: "/volunteer" },
     { label: "Foster", href: "/foster" },
     { label: "Donate", href: "/donate" },
-    { label: "Corporate Sponsors", href: "/sponsor" },
+    { label: "Corporate Partners", href: "/corporate" },
     { label: "Events", href: "/events" },
   ],
   learn: [
