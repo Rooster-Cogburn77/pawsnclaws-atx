@@ -11,6 +11,9 @@ const iconMap: Record<string, string> = {
   heart: "❤️",
   alert: "🚨",
   home: "🏠",
+  food: "🍲",
+  wildlife: "🦝",
+  training: "🎓",
 };
 
 export default function CharlotteResourcesPage() {
