@@ -64,48 +64,98 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What We Do */}
+      {/* Need Help Section */}
       <section className="py-16 bg-gray-50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            How We Help
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+            Need Help With Your Pet?
           </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            We offer programs to help keep pets with their families. All services are free or low-cost.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <FeatureCard
+              emoji="🏠"
+              title="Pet Deposit Help"
+              description="0% interest loans to cover pet deposits when moving."
+              href="/help/deposit-assistance"
+            />
+            <FeatureCard
+              emoji="💕"
+              title="Surrender Prevention"
+              description="Explore options before giving up your pet. We can help."
+              href="/help/surrender-prevention"
+            />
+            <FeatureCard
+              emoji="🏥"
+              title="Emergency Vet Fund"
+              description="Financial help for unexpected vet emergencies."
+              href="/help/vet-fund"
+            />
+            <FeatureCard
+              emoji="🍲"
+              title="Free Pet Food"
+              description="Pet food stations around Austin. No questions asked."
+              href="/food-stations"
+            />
+          </div>
+          <div className="text-center mt-8">
+            <Link
+              href="/help"
+              className="inline-flex items-center gap-2 text-amber-600 font-semibold hover:text-amber-700"
+            >
+              See all help programs
+              <ArrowRightIcon className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Ways to Help */}
+      <section className="py-16 bg-white">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+            Ways to Help
+          </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Every action makes a difference. Find the way that works for you.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
-              emoji="📍"
-              title="Connect to Resources"
-              description="Find low-cost vets, pet food assistance, and emergency services in Austin."
-              href="/resources"
-            />
-            <FeatureCard
-              emoji="🐱"
-              title="Community Cat Care"
-              description="Learn about TNR programs and how to help feral and stray cats humanely."
-              href="/resources#tnr"
-            />
-            <FeatureCard
               emoji="🤝"
-              title="Volunteer Opportunities"
-              description="Links to local shelters and rescues that need your help."
-              href="/get-involved"
+              title="Volunteer"
+              description="Join our team - help with food stations, transport, events, and more."
+              href="/volunteer"
             />
             <FeatureCard
               emoji="🏠"
-              title="Foster & Adopt"
-              description="Open your home to an animal in need - even temporarily."
-              href="/get-involved#foster"
+              title="Foster a Pet"
+              description="Open your home temporarily. We provide all supplies and vet care."
+              href="/foster"
             />
             <FeatureCard
               emoji="💰"
-              title="Donate Wisely"
-              description="Direct links to trusted local rescues and shelters."
-              href="/get-involved#donate"
+              title="Donate"
+              description="Support our programs or donate to specific campaigns."
+              href="/donate"
             />
             <FeatureCard
-              emoji="📞"
-              title="Know Who to Call"
-              description="Emergency numbers and what to do when you find a stray."
-              href="/resources#emergency"
+              emoji="🔍"
+              title="Lost & Found"
+              description="Report or search for lost and found pets in the Austin area."
+              href="/lost-found"
+            />
+            <FeatureCard
+              emoji="🗺️"
+              title="Colony Map"
+              description="View and support managed community cat colonies."
+              href="/map"
+            />
+            <FeatureCard
+              emoji="📖"
+              title="Resources"
+              description="Low-cost vets, TNR info, emergency contacts, and more."
+              href="/resources"
             />
           </div>
         </div>
