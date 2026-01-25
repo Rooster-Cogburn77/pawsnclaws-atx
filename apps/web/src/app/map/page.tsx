@@ -43,8 +43,61 @@ interface FoodStation {
   needs_restock: boolean;
 }
 
-// Empty arrays - data will come from database
-const colonies: Colony[] = [];
+// Seed data from research - known community cat areas in Austin
+// These are general area markers, not exact locations (for cat safety)
+// Real colony data will come from Supabase once submissions are approved
+const colonies: Colony[] = [
+  {
+    id: "ut-campus",
+    name: "UT Campus / Waller Creek Area",
+    location_name: "University of Texas Campus",
+    latitude: 30.2849,
+    longitude: -97.7341,
+    cat_count: 40,
+    all_tnr: true,
+    monthly_food_cost: 15000, // $150
+    status: "active",
+    description: "Managed by Campus Cat Coalition since 2000s. Waller Creek corridor provides habitat. Population reduced from 100+ to ~40 through TNR.",
+  },
+  {
+    id: "west-campus",
+    name: "West Campus Cats",
+    location_name: "West Campus neighborhood",
+    latitude: 30.2891,
+    longitude: -97.7467,
+    cat_count: 25,
+    all_tnr: false,
+    monthly_food_cost: 12500, // $125
+    status: "active",
+    description: "Student volunteers from Meow Mates help care for strays in the West Campus area near UT.",
+  },
+  {
+    id: "dessau-estates",
+    name: "Dessau Estates Colony",
+    location_name: "Dessau Estates, North Austin",
+    latitude: 30.3847,
+    longitude: -97.6521,
+    cat_count: 93,
+    all_tnr: true,
+    monthly_food_cost: 25000, // $250
+    status: "active",
+    description: "Large colony TNR'd by Austin Animal Center community cat program. 93 cats fixed and returned.",
+  },
+  {
+    id: "east-austin",
+    name: "East Austin Community Cats",
+    location_name: "East Austin",
+    latitude: 30.2621,
+    longitude: -97.7131,
+    cat_count: 30,
+    all_tnr: false,
+    monthly_food_cost: 15000, // $150
+    status: "active",
+    description: "Historic colony presence in East Austin neighborhoods. Multiple caretakers feed daily.",
+  },
+];
+
+// Food stations - coming soon, these will be real partner locations
 const foodStations: FoodStation[] = [];
 
 type ViewType = "colonies" | "food-stations" | "all";

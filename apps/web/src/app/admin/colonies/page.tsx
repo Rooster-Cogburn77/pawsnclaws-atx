@@ -26,43 +26,9 @@ interface ColonySubmission {
   reviewNotes?: string;
 }
 
-// Demo data - will come from Supabase
-const demoSubmissions: ColonySubmission[] = [
-  {
-    id: "1",
-    colonyName: "East Riverside Cats",
-    locationDescription: "Behind the apartment complex on East Riverside, near the creek. Cats gather around the dumpster area.",
-    address: "1200 E Riverside Dr",
-    latitude: 30.2398,
-    longitude: -97.7273,
-    estimatedCats: 12,
-    tnrStatus: "partial",
-    hasCaretaker: "yes",
-    feedingSchedule: "Daily at 7am",
-    urgentNeeds: ["tnr-needed", "shelter"],
-    additionalInfo: "About 8 cats are fixed (ear-tipped). 4 new cats appeared recently and need TNR.",
-    submitterName: "Jane Doe",
-    submitterEmail: "jane@example.com",
-    submitterPhone: "512-555-0123",
-    submitterRelation: "caretaker",
-    status: "pending",
-    createdAt: "2026-01-24T10:30:00Z",
-  },
-  {
-    id: "2",
-    colonyName: "",
-    locationDescription: "Small group of cats in the parking lot of the abandoned building on N Lamar",
-    estimatedCats: 5,
-    tnrStatus: "unknown",
-    hasCaretaker: "no",
-    urgentNeeds: ["food-needed", "caretaker"],
-    submitterName: "John Smith",
-    submitterEmail: "john@example.com",
-    submitterRelation: "observer",
-    status: "pending",
-    createdAt: "2026-01-23T15:45:00Z",
-  },
-];
+// Submissions will come from Supabase
+// Empty until real submissions arrive through /map/submit
+const demoSubmissions: ColonySubmission[] = [];
 
 export default function AdminColoniesPage() {
   const [submissions] = useState<ColonySubmission[]>(demoSubmissions);
