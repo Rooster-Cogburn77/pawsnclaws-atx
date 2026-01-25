@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "About",
-  description: "Learn about PawsNClaws CLT and our mission to help Charlotte's community cats.",
+  description: "Learn about PawsNClaws CLT and our mission to help Charlotte pets and people stay together.",
 };
 
 export default function CharlotteAboutPage() {
@@ -15,7 +15,7 @@ export default function CharlotteAboutPage() {
             About PawsNClaws CLT
           </h1>
           <p className="text-xl text-gray-600">
-            Bringing community cat support to the Queen City
+            Helping Charlotte pets and people stay together
           </p>
         </div>
       </section>
@@ -26,17 +26,16 @@ export default function CharlotteAboutPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h2>
             <p className="text-gray-700 mb-4">
-              PawsNClaws CLT is dedicated to supporting Charlotte&apos;s community cats
-              and the people who care for them. We believe in humane, effective
-              management of community cat populations through TNR (Trap-Neuter-Return),
-              colony support, and community education.
+              PawsNClaws CLT is dedicated to keeping pets and their families together
+              in the Charlotte area. We provide emergency assistance, surrender prevention
+              resources, foster programs, and community cat support through TNR coordination.
             </p>
             <p className="text-gray-700">
-              We&apos;re an extension of{" "}
+              We&apos;re an initiative of{" "}
               <Link href="/" className="text-teal-600 hover:text-teal-700">
                 PawsNClaws ATX
               </Link>
-              , bringing proven programs and resources to the Charlotte area.
+              , an Austin-based nonprofit expanding community pet support across America.
             </p>
           </div>
         </div>
@@ -50,11 +49,35 @@ export default function CharlotteAboutPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <span className="text-3xl mb-3 block">🗺️</span>
-              <h3 className="font-bold text-gray-900 mb-2">Colony Mapping</h3>
+              <span className="text-3xl mb-3 block">🏥</span>
+              <h3 className="font-bold text-gray-900 mb-2">Emergency Vet Fund</h3>
               <p className="text-gray-600 text-sm">
-                We track and map community cat colonies across Charlotte and
-                Mecklenburg County to coordinate care and prevent duplication.
+                We help cover unexpected veterinary costs so families don&apos;t have
+                to choose between their pet and their bills.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <span className="text-3xl mb-3 block">💕</span>
+              <h3 className="font-bold text-gray-900 mb-2">Surrender Prevention</h3>
+              <p className="text-gray-600 text-sm">
+                Before you give up your pet, talk to us. We help find solutions
+                to keep families together.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <span className="text-3xl mb-3 block">🏠</span>
+              <h3 className="font-bold text-gray-900 mb-2">Pet Deposit Assistance</h3>
+              <p className="text-gray-600 text-sm">
+                Moving and can&apos;t afford the pet deposit? We offer 0% interest
+                loans so you can keep your pet when you move.
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <span className="text-3xl mb-3 block">🐱</span>
+              <h3 className="font-bold text-gray-900 mb-2">Foster Programs</h3>
+              <p className="text-gray-600 text-sm">
+                Temporary foster care for pets in crisis situations, giving
+                families time to get back on their feet.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -66,19 +89,11 @@ export default function CharlotteAboutPage() {
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <span className="text-3xl mb-3 block">🍲</span>
-              <h3 className="font-bold text-gray-900 mb-2">Colony Support</h3>
+              <span className="text-3xl mb-3 block">🗺️</span>
+              <h3 className="font-bold text-gray-900 mb-2">Colony Mapping</h3>
               <p className="text-gray-600 text-sm">
-                We help caretakers with food, supplies, and shelters to keep
-                their colonies healthy and well-fed.
-              </p>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <span className="text-3xl mb-3 block">🏥</span>
-              <h3 className="font-bold text-gray-900 mb-2">Emergency Support</h3>
-              <p className="text-gray-600 text-sm">
-                Our emergency vet fund helps cover unexpected medical costs for
-                community cats and pets in need.
+                We track community cat colonies across Charlotte to coordinate
+                care and connect caretakers with resources.
               </p>
             </div>
           </div>
@@ -90,12 +105,12 @@ export default function CharlotteAboutPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-teal-600 rounded-2xl p-8 text-white">
             <h2 className="text-2xl font-bold mb-6 text-center">
-              Charlotte&apos;s Community Cat Challenge
+              Charlotte Pet Support
             </h2>
             <div className="grid sm:grid-cols-3 gap-6 text-center">
               <div>
                 <div className="text-4xl font-bold">4,000+</div>
-                <div className="text-teal-100">Cats in shelters annually</div>
+                <div className="text-teal-100">Pets in shelters annually</div>
               </div>
               <div>
                 <div className="text-4xl font-bold">$50</div>
@@ -114,7 +129,7 @@ export default function CharlotteAboutPage() {
       <section className="px-4 pb-16">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Help Us Help Charlotte&apos;s Cats
+            Help Us Help Charlotte&apos;s Pets
           </h2>
           <p className="text-gray-600 mb-8">
             Whether you can donate, volunteer, or foster - every bit helps.

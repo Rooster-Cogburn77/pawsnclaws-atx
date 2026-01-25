@@ -28,11 +28,13 @@ export const cities: Record<string, CityConfig> = {
       accent: "text-amber-500",
     },
     nav: [
+      { label: "Home", href: "/" },
+      { label: "Get Help", href: "/help" },
       { label: "Map", href: "/map" },
       { label: "Resources", href: "/resources" },
-      { label: "Get Help", href: "/help" },
       { label: "Volunteer", href: "/volunteer" },
       { label: "Foster", href: "/foster" },
+      { label: "About", href: "/about" },
     ],
     emergency: [
       { name: "Austin 311", phone: "311" },
@@ -44,18 +46,20 @@ export const cities: Record<string, CityConfig> = {
     slug: "charlotte",
     name: "PawsNClaws CLT",
     shortName: "CLT",
-    tagline: "Supporting Charlotte's community cats",
+    tagline: "Helping Charlotte pets and people stay together",
     color: {
       primary: "bg-teal-600",
       primaryHover: "hover:bg-teal-700",
       accent: "text-teal-600",
     },
     nav: [
+      { label: "Home", href: "/cities/charlotte" },
+      { label: "Get Help", href: "/cities/charlotte/help" },
       { label: "Map", href: "/cities/charlotte/map" },
       { label: "Resources", href: "/cities/charlotte/resources" },
-      { label: "Get Help", href: "/cities/charlotte/help" },
       { label: "Volunteer", href: "/cities/charlotte/volunteer" },
       { label: "Foster", href: "/cities/charlotte/foster" },
+      { label: "About", href: "/cities/charlotte/about" },
     ],
     emergency: [
       { name: "CARE Charlotte", phone: "(704) 457-2300" },

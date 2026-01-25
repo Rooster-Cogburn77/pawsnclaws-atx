@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "PawsNClaws CLT - Charlotte Community Cat Support",
+    default: "PawsNClaws CLT - Charlotte Pet Support",
     template: "%s | PawsNClaws CLT",
   },
-  description: "Supporting Charlotte's community cats through TNR, foster programs, and colony care. A chapter of PawsNClaws ATX.",
+  description: "Helping Charlotte pets and people stay together through emergency vet funds, surrender prevention, foster programs, and TNR coordination. An initiative of PawsNClaws ATX.",
 };
 
 export default function CharlotteLayout({

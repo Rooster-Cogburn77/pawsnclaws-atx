@@ -34,8 +34,9 @@ export default function CharlottePage() {
           PawsNClaws <span className="text-teal-600">CLT</span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Bringing community cat support to Charlotte, North Carolina.
-          TNR coordination, colony care, and foster programs for the Queen City.
+          Bringing community pet support to Charlotte, North Carolina.
+          Helping pets and people stay together through emergency assistance,
+          foster programs, and TNR coordination for the Queen City.
         </p>
 
         {/* Notify Form */}
@@ -69,7 +70,7 @@ export default function CharlottePage() {
       <section className="bg-white py-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Charlotte&apos;s Community Cat Challenge
+            Charlotte&apos;s Pet Support Needs
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center p-6 bg-gray-50 rounded-xl">
@@ -261,7 +262,7 @@ export default function CharlottePage() {
             , an Austin-based 501(c)(3) nonprofit.
           </p>
           <p className="text-gray-500 text-xs mt-2">
-            Expanding community cat support across America.
+            Expanding community pet support across America.
           </p>
         </div>
       </footer>
