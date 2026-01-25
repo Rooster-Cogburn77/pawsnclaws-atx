@@ -1,9 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
-export const metadata = {
-  title: "Partnership Deck | PawsNClaws ATX",
-  description: "Corporate partnership opportunities with PawsNClaws ATX. Sponsorship tiers, impact areas, and partnership benefits.",
-};
+// Note: metadata would go in layout.tsx for client components
 
 export default function SponsorDeckPage() {
   return (
