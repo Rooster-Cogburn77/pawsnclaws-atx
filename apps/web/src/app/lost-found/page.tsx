@@ -1,13 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MapPinIcon } from "@/components/Icons";
 
 type ListingType = "lost" | "found" | "all";
 
-// Demo data - will come from Supabase
-const demoListings = [
+interface Listing {
+  id: string;
+  type: "lost" | "found";
+  species: string;
+  breed?: string;
+  name?: string | null;
+  color: string;
+  description: string;
+  location_last_seen?: string;
+  location_found?: string;
+  contact_name: string;
+  contact_phone?: string;
+  contact_email?: string;
+  photos: string[];
+  status: "active" | "reunited" | "closed";
+  created_at: string;
+}
+
+// Demo data - used when Supabase is not connected
+const demoListings: Listing[] = [
   {
     id: "1",
     type: "lost" as const,
@@ -73,8 +91,29 @@ const demoListings = [
 export default function LostFoundPage() {
   const [filter, setFilter] = useState<ListingType>("all");
   const [speciesFilter, setSpeciesFilter] = useState<string>("all");
+  const [listings, setListings] = useState<Listing[]>(demoListings);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredListings = demoListings.filter((listing) => {
+  useEffect(() => {
+    async function fetchListings() {
+      try {
+        const response = await fetch("/api/lost-found");
+        const data = await response.json();
+        if (data.listings && data.listings.length > 0) {
+          setListings(data.listings);
+        }
+        // If no listings from API, keep demo data
+      } catch (error) {
+        console.error("Failed to fetch listings:", error);
+        // Keep demo data on error
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchListings();
+  }, []);
+
+  const filteredListings = listings.filter((listing) => {
     if (filter !== "all" && listing.type !== filter) return false;
     if (speciesFilter !== "all" && listing.species !== speciesFilter) return false;
     return listing.status === "active";
@@ -156,7 +195,12 @@ export default function LostFoundPage() {
       {/* Listings */}
       <section className="px-4 pb-16">
         <div className="max-w-5xl mx-auto">
-          {filteredListings.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+              <p className="text-gray-500 mt-4">Loading listings...</p>
+            </div>
+          ) : filteredListings.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500">No listings match your filters.</p>
             </div>
@@ -203,7 +247,7 @@ export default function LostFoundPage() {
   );
 }
 
-function ListingCard({ listing }: { listing: (typeof demoListings)[0] }) {
+function ListingCard({ listing }: { listing: Listing }) {
   const isLost = listing.type === "lost";
 
   return (

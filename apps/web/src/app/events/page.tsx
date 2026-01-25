@@ -1,7 +1,21 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  location: string;
+  type: string;
+  description: string;
+  spots: number | null;
+}
+
 // Sample events - will be dynamic from Supabase
-const upcomingEvents = [
+const upcomingEvents: Event[] = [
   {
     id: "1",
     title: "Colony Care Saturday",
@@ -66,6 +80,55 @@ const eventTypeColors: Record<string, string> = {
 };
 
 export default function EventsPage() {
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEvent) return;
+
+    setStatus("loading");
+    try {
+      const response = await fetch("/api/events/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventId: selectedEvent.id,
+          eventTitle: selectedEvent.title,
+          eventDate: new Date(selectedEvent.date).toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          }) + " at " + selectedEvent.time,
+          ...formData,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus("success");
+        setMessage(data.message || "You're signed up!");
+      } else {
+        setStatus("error");
+        setMessage(data.error || "Something went wrong");
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Network error. Please try again.");
+    }
+  };
+
+  const closeModal = () => {
+    setSelectedEvent(null);
+    setFormData({ name: "", email: "", phone: "" });
+    setStatus("idle");
+    setMessage("");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -144,7 +207,10 @@ export default function EventsPage() {
                       {event.spots} spots available
                     </span>
                   )}
-                  <button className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors">
+                  <button
+                    onClick={() => setSelectedEvent(event)}
+                    className="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition-colors"
+                  >
                     Sign Up
                   </button>
                 </div>
@@ -199,6 +265,122 @@ export default function EventsPage() {
           </Link>
         </div>
       </div>
+
+      {/* Signup Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Sign Up for Event
+                  </h2>
+                  <p className="text-sm text-gray-600">{selectedEvent.title}</p>
+                </div>
+                <button
+                  onClick={closeModal}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Event Details */}
+              <div className="bg-amber-50 rounded-lg p-4 mb-6">
+                <div className="flex flex-wrap gap-3 text-sm">
+                  <span className="flex items-center gap-1">
+                    <span>📅</span>
+                    {new Date(selectedEvent.date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span>🕐</span>
+                    {selectedEvent.time}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span>📍</span>
+                    {selectedEvent.location}
+                  </span>
+                </div>
+              </div>
+
+              {status === "success" ? (
+                <div className="text-center py-6">
+                  <span className="text-4xl block mb-4">✓</span>
+                  <p className="text-green-700 font-medium mb-2">{message}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Check your email for confirmation details.
+                  </p>
+                  <button
+                    onClick={closeModal}
+                    className="px-6 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600"
+                  >
+                    Done
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone (optional)
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {status === "error" && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                      {message}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="w-full py-3 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50"
+                  >
+                    {status === "loading" ? "Signing up..." : "Confirm Signup"}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

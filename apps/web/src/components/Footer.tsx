@@ -228,10 +228,17 @@ export function Footer() {
             <p className="text-xs text-gray-500">
               {siteConfig.footer.disclaimer}
             </p>
-            <p className="text-xs text-gray-500">
-              © {new Date().getFullYear()} {siteConfig.name}. Made with ❤️ for
-              Austin&apos;s animals.
-            </p>
+            <div className="flex items-center gap-4">
+              <Link href="/privacy" className="text-xs text-gray-500 hover:text-amber-500">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="text-xs text-gray-500 hover:text-amber-500">
+                Terms of Service
+              </Link>
+              <p className="text-xs text-gray-500">
+                © {new Date().getFullYear()} {siteConfig.name}
+              </p>
+            </div>
           </div>
         </div>
       </div>
