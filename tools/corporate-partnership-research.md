@@ -560,6 +560,52 @@ To maximize matching gift revenue, register with:
 
 ---
 
+---
+
+## Community Partnership Opportunities
+
+These are not corporate sponsors but potential collaboration partners in the Austin animal welfare community.
+
+### Campus Cat Coalition (UT Austin)
+
+**What They Do:**
+- Volunteer caretakers managing ~40 cats on UT Austin campus
+- Reduced population from 100+ to ~40 through TNR since 2000s
+- Waller Creek corridor serves as natural habitat
+- Student organization "Meow Mates" (~20 students) helps in West Campus
+
+**Partnership Potential:**
+- Centralized donation processing for their operations
+- Shared volunteer recruitment
+- Food supply support
+- Combined publicity/awareness campaigns
+- They have established infrastructure we can learn from
+
+**Contact Approach:**
+- Reach out through UT student organizations
+- Contact through Austin Animal Center (they coordinate)
+- Daily Texan student newspaper connection
+
+**Status:** On outreach list - not ready to contact yet
+
+**Sources:**
+- https://thedailytexan.com/2015/11/25/ut-policies-control-campus-cat-colonies/
+- https://thedailytexan.com/2024/09/15/a-helping-hand-students-start-new-organization-to-take-care-of-west-campus-stray-cats/
+
+---
+
+### Other Community Partners to Consider
+
+| Organization | Focus | Partnership Angle |
+|--------------|-------|-------------------|
+| Austin Humane Society | Community cat program | TNR coordination, referrals |
+| Street Cat Rescue | Round Rock TNR | Regional collaboration |
+| Central Texas Feline Rescue | Colony management | Knowledge sharing, supplies |
+| Shadow Cats | Round Rock rescue | Foster network |
+| Emancipet | Low-cost spay/neuter | Client referrals |
+
+---
+
 ## Sources
 
 - [Apple CSR Programs](https://www.thomasnet.com/insights/apple-csr/)
