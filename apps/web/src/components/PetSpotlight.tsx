@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 
+// Note: This component will display real adoptable pets from Supabase
+// or partner APIs when integrated. Until then, it shows a placeholder.
+
 interface Pet {
   name: string;
   species: "cat" | "dog";
@@ -13,112 +16,71 @@ interface Pet {
   photo?: string;
 }
 
-// Sample pets - would come from Supabase or partner API
-const featuredPets: Pet[] = [
-  {
-    name: "Butterscotch",
-    species: "cat",
-    breed: "Orange Tabby",
-    age: "2 years",
-    description: "Butterscotch is a laid-back lovebug who enjoys chin scratches and sunbeams. He gets along great with other cats!",
-    traits: ["Good with cats", "Lap cat", "Indoor only"],
-    status: "available",
-  },
-  {
-    name: "Luna",
-    species: "cat",
-    breed: "Tuxedo",
-    age: "1 year",
-    description: "Luna is playful and curious. She loves feather toys and will 'help' with your work from home setup.",
-    traits: ["Playful", "Young", "First-time owner friendly"],
-    status: "available",
-  },
-  {
-    name: "Buddy",
-    species: "dog",
-    breed: "Lab Mix",
-    age: "4 years",
-    description: "Buddy is a gentle giant who loves walks and belly rubs. He's great with kids and other dogs.",
-    traits: ["Good with kids", "Good with dogs", "House trained"],
-    status: "pending",
-  },
-];
-
 export function PetSpotlight({ className = "" }: { className?: string }) {
-  const pet = featuredPets[Math.floor(Math.random() * featuredPets.length)];
-  const petEmoji = pet.species === "cat" ? "🐱" : "🐕";
-
   return (
     <div className={`bg-white rounded-xl shadow-lg overflow-hidden ${className}`}>
       <div className="bg-gradient-to-r from-amber-400 to-amber-500 p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-white font-bold">Pet of the Week</h3>
-          <span className="text-2xl">{petEmoji}</span>
+          <h3 className="text-white font-bold">Featured Pet</h3>
+          <span className="text-2xl">🐾</span>
         </div>
       </div>
 
-      <div className="p-5">
-        {/* Pet Image Placeholder */}
+      <div className="p-5 text-center">
+        {/* Placeholder */}
         <div className="bg-gradient-to-br from-amber-100 to-amber-200 h-48 rounded-lg mb-4 flex items-center justify-center">
-          <span className="text-6xl opacity-50">{petEmoji}</span>
-        </div>
-
-        {/* Pet Info */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-1">
-            <h4 className="font-bold text-gray-900 text-xl">{pet.name}</h4>
-            <span
-              className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                pet.status === "available"
-                  ? "bg-green-100 text-green-700"
-                  : pet.status === "pending"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-gray-100 text-gray-600"
-              }`}
-            >
-              {pet.status === "available" ? "Available" : pet.status === "pending" ? "Adoption Pending" : "Adopted"}
-            </span>
+          <div className="text-center">
+            <span className="text-5xl block mb-2">🐱🐕</span>
+            <span className="text-amber-700 text-sm">Coming Soon</span>
           </div>
-          <p className="text-sm text-gray-600">
-            {pet.breed} • {pet.age}
-          </p>
         </div>
 
-        <p className="text-gray-700 text-sm mb-4">{pet.description}</p>
-
-        {/* Traits */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {pet.traits.map((trait, idx) => (
-            <span
-              key={idx}
-              className="px-2 py-1 bg-amber-50 text-amber-700 text-xs rounded-full"
-            >
-              {trait}
-            </span>
-          ))}
-        </div>
-
-        {/* CTA */}
-        {pet.status === "available" && (
-          <Link
-            href="/foster"
-            className="block w-full py-2 bg-amber-500 text-white text-center font-medium rounded-lg hover:bg-amber-600 transition-colors"
-          >
-            Inquire About {pet.name}
-          </Link>
-        )}
+        <h4 className="font-bold text-gray-900 text-lg mb-2">
+          Adoptable Pets Coming Soon
+        </h4>
+        <p className="text-gray-600 text-sm mb-4">
+          We&apos;re working on featuring real adoptable pets from local shelters and our foster network.
+        </p>
+        <Link
+          href="/foster"
+          className="block w-full py-2 bg-amber-500 text-white text-center font-medium rounded-lg hover:bg-amber-600 transition-colors"
+        >
+          Learn About Fostering
+        </Link>
       </div>
     </div>
   );
 }
 
-// Grid version for showing multiple pets
-export function PetGrid({ pets = featuredPets, className = "" }: { pets?: Pet[]; className?: string }) {
+// Grid version - placeholder until real pets are available
+export function PetGrid({ pets, className = "" }: { pets?: Pet[]; className?: string }) {
+  // If real pets are passed, display them
+  if (pets && pets.length > 0) {
+    return (
+      <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
+        {pets.map((pet, idx) => (
+          <PetCard key={idx} pet={pet} />
+        ))}
+      </div>
+    );
+  }
+
+  // Otherwise show placeholder
   return (
-    <div className={`grid md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
-      {pets.map((pet, idx) => (
-        <PetCard key={idx} pet={pet} />
-      ))}
+    <div className={`${className}`}>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
+        <span className="text-4xl mb-4 block">🐾</span>
+        <h3 className="font-bold text-blue-900 mb-2">Adoptable Pets Coming Soon</h3>
+        <p className="text-blue-800 text-sm mb-4">
+          We&apos;re working on featuring real adoptable pets from local shelters.
+        </p>
+        <Link
+          href="/foster"
+          className="inline-block px-4 py-2 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors"
+        >
+          Become a Foster
+        </Link>
+      </div>
     </div>
   );
 }
