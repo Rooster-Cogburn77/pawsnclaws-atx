@@ -87,7 +87,7 @@ export function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="px-4 py-2 rounded-lg flex-1 md:w-64 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  className="px-4 py-2 rounded-lg flex-1 md:w-64 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300"
                   disabled={status === "loading"}
                   required
                 />
