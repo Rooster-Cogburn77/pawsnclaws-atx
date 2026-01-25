@@ -41,3 +41,9 @@ out/
 # Logs
 *.log
 logs/
+
+# Local tooling
+.claude/
+.conductor/
+tools/conductor/
+conductor_analysis.json
