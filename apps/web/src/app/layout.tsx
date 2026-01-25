@@ -41,6 +41,33 @@ export const metadata: Metadata = {
   },
 };
 
+// JSON-LD structured data for SEO
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  name: "PawsNClaws ATX",
+  alternateName: "PawsNClaws",
+  description: siteConfig.description,
+  url: "https://pawsandclawsatx.com",
+  logo: "https://pawsandclawsatx.com/logo.png",
+  sameAs: [
+    // Add social media URLs when available
+  ],
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Austin",
+    addressRegion: "TX",
+    addressCountry: "US",
+  },
+  areaServed: [
+    { "@type": "City", name: "Austin", "@id": "https://www.wikidata.org/wiki/Q16559" },
+    { "@type": "City", name: "Charlotte", "@id": "https://www.wikidata.org/wiki/Q16559" },
+  ],
+  nonprofitStatus: "Nonprofit501c3",
+  foundingDate: "2024",
+  keywords: "animal rescue, pet resources, TNR, community cats, Austin, Charlotte",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,6 +75,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <div className="flex min-h-screen flex-col">
           <Header />
