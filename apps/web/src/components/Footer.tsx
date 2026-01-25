@@ -274,7 +274,7 @@ export function Footer() {
         <div className="mt-8 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-xs text-gray-500">
-              Helping pets and people stay together since 2024. Not a 501(c)(3) yet, but working on it.
+              Helping pets and people stay together since 2024. A 501(c)(3) nonprofit organization.
             </p>
             <div className="flex items-center gap-4">
               <Link href="/privacy" className={`text-xs text-gray-500 ${hoverColor}`}>
