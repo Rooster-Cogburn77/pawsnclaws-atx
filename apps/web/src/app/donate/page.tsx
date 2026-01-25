@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { donationTiers, subscriptionTiers, formatAmount, calculateFee } from "@/lib/stripe";
 import { HeartIcon } from "@/components/Icons";
+import { ImpactCalculator } from "@/components/ImpactCalculator";
 
 type DonationType = "one-time" | "monthly";
 
@@ -270,6 +271,11 @@ export default function DonatePage() {
               <span>Powered by Stripe</span>
             </div>
           </form>
+
+          {/* Impact Calculator */}
+          <div className="mt-12">
+            <ImpactCalculator />
+          </div>
 
           {/* Other Ways to Give */}
           <div className="mt-12">
