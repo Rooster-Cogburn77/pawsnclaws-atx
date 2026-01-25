@@ -1,38 +1,61 @@
 "use client";
 
 import Link from "next/link";
-import { siteConfig } from "@/data/site-config";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-
-const footerLinks = {
-  getHelp: [
-    { label: "Pet Deposit Assistance", href: "/help/deposit-assistance" },
-    { label: "Surrender Prevention", href: "/help/surrender-prevention" },
-    { label: "Emergency Vet Fund", href: "/help/vet-fund" },
-    { label: "Free Pet Food", href: "/food-stations" },
-    { label: "Lost & Found", href: "/lost-found" },
-  ],
-  getInvolved: [
-    { label: "Volunteer", href: "/volunteer" },
-    { label: "Foster", href: "/foster" },
-    { label: "Donate", href: "/donate" },
-    { label: "Corporate Partners", href: "/corporate" },
-    { label: "Events", href: "/events" },
-  ],
-  learn: [
-    { label: "Resources", href: "/resources" },
-    { label: "Success Stories", href: "/stories" },
-    { label: "Impact", href: "/impact" },
-    { label: "About Us", href: "/about" },
-    { label: "FAQ", href: "/faq" },
-    { label: "Contact", href: "/contact" },
-  ],
-};
+import { getCityFromPath, getCityHomeLink } from "@/config/cities";
 
 export function Footer() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const pathname = usePathname();
+  const city = getCityFromPath(pathname);
+
+  const isAustin = city.slug === "austin";
+  const bgColor = isAustin ? "bg-amber-500" : "bg-teal-600";
+  const lightTextColor = isAustin ? "text-amber-100" : "text-teal-100";
+  const accentColor = isAustin ? "text-amber-500 hover:text-amber-400" : "text-teal-500 hover:text-teal-400";
+  const hoverColor = isAustin ? "hover:text-amber-500" : "hover:text-teal-500";
+  const focusRing = isAustin ? "focus:ring-amber-300" : "focus:ring-teal-300";
+
+  // City-specific links
+  const prefix = isAustin ? "" : "/cities/charlotte";
+
+  const footerLinks = {
+    getHelp: [
+      { label: "Pet Deposit Assistance", href: `${prefix}/help/deposit-assistance` },
+      { label: "Surrender Prevention", href: `${prefix}/help/surrender-prevention` },
+      { label: "Emergency Vet Fund", href: `${prefix}/help/vet-fund` },
+      ...(isAustin ? [
+        { label: "Free Pet Food", href: "/food-stations" },
+        { label: "Lost & Found", href: "/lost-found" },
+      ] : []),
+    ],
+    getInvolved: [
+      { label: "Volunteer", href: `${prefix}/volunteer` },
+      { label: "Foster", href: `${prefix}/foster` },
+      { label: "Donate", href: `${prefix}/donate` },
+      ...(isAustin ? [
+        { label: "Corporate Partners", href: "/corporate" },
+        { label: "Events", href: "/events" },
+      ] : [
+        { label: "Report a Colony", href: "/cities/charlotte/map/submit" },
+      ]),
+    ],
+    learn: [
+      { label: "Resources", href: `${prefix}/resources` },
+      ...(isAustin ? [
+        { label: "Success Stories", href: "/stories" },
+        { label: "Impact", href: "/impact" },
+        { label: "About Us", href: "/about" },
+        { label: "FAQ", href: "/faq" },
+      ] : [
+        { label: "About Charlotte", href: "/cities/charlotte/about" },
+      ]),
+      { label: "Contact", href: `${prefix}/contact` },
+    ],
+  };
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +66,7 @@ export function Footer() {
       const response = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, city: city.slug }),
       });
 
       const data = await response.json();
@@ -65,15 +88,15 @@ export function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Newsletter Section */}
-      <div className="bg-amber-500">
+      <div className={bgColor}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
               <h3 className="text-white font-bold text-lg">
                 Stay in the Loop
               </h3>
-              <p className="text-amber-100 text-sm">
-                Get updates on events, success stories, and ways to help.
+              <p className={`${lightTextColor} text-sm`}>
+                Get updates on events, success stories, and ways to help{!isAustin && " in Charlotte"}.
               </p>
             </div>
             {status === "success" ? (
@@ -87,7 +110,7 @@ export function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="px-4 py-2 rounded-lg flex-1 md:w-64 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  className={`px-4 py-2 rounded-lg flex-1 md:w-64 bg-white text-gray-900 focus:outline-none focus:ring-2 ${focusRing}`}
                   disabled={status === "loading"}
                   required
                 />
@@ -113,18 +136,26 @@ export function Footer() {
           {/* About */}
           <div className="col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl">🐾</span>
+              <span className="text-2xl">{isAustin ? "🐾" : "🐱"}</span>
               <span className="font-bold text-white text-lg">
-                {siteConfig.name}
+                {city.name}
               </span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              {siteConfig.footer.mission}
+              {city.tagline}
             </p>
+            {!isAustin && (
+              <p className="text-xs text-gray-500 mb-4">
+                A chapter of{" "}
+                <Link href="/" className={accentColor}>
+                  PawsNClaws ATX
+                </Link>
+              </p>
+            )}
             <div className="flex gap-4">
               <a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 transition-colors"
+                className={`text-gray-400 ${hoverColor} transition-colors`}
                 aria-label="Instagram"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -133,7 +164,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 transition-colors"
+                className={`text-gray-400 ${hoverColor} transition-colors`}
                 aria-label="Facebook"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -142,7 +173,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 transition-colors"
+                className={`text-gray-400 ${hoverColor} transition-colors`}
                 aria-label="Twitter"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -160,7 +191,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-400 hover:text-amber-500 transition-colors"
+                    className={`text-sm text-gray-400 ${hoverColor} transition-colors`}
                   >
                     {link.label}
                   </Link>
@@ -177,7 +208,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-400 hover:text-amber-500 transition-colors"
+                    className={`text-sm text-gray-400 ${hoverColor} transition-colors`}
                   >
                     {link.label}
                   </Link>
@@ -194,7 +225,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-400 hover:text-amber-500 transition-colors"
+                    className={`text-sm text-gray-400 ${hoverColor} transition-colors`}
                   >
                     {link.label}
                   </Link>
@@ -209,14 +240,30 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-gray-400">
               <strong className="text-white">Animal Emergency?</strong>{" "}
-              Call Austin 311 or{" "}
-              <a href="tel:1-888-426-4435" className="text-amber-500 hover:underline">
-                Animal Poison Control: (888) 426-4435
-              </a>
+              {isAustin ? (
+                <>
+                  Call Austin 311 or{" "}
+                  <a href="tel:1-888-426-4435" className={accentColor}>
+                    Animal Poison Control: (888) 426-4435
+                  </a>
+                </>
+              ) : (
+                <>
+                  {city.emergency.map((e, i) => (
+                    <span key={e.name}>
+                      {i > 0 && " | "}
+                      <span className="text-white">{e.name}:</span>{" "}
+                      <a href={`tel:${e.phone.replace(/[^0-9]/g, "")}`} className={accentColor}>
+                        {e.phone}
+                      </a>
+                    </span>
+                  ))}
+                </>
+              )}
             </div>
             <Link
-              href="/resources#emergency"
-              className="text-sm text-amber-500 hover:text-amber-400 font-medium"
+              href={`${prefix}/resources#emergency`}
+              className={`text-sm ${accentColor} font-medium`}
             >
               24/7 Emergency Vets →
             </Link>
@@ -227,17 +274,17 @@ export function Footer() {
         <div className="mt-8 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-xs text-gray-500">
-              {siteConfig.footer.disclaimer}
+              Helping pets and people stay together since 2024. Not a 501(c)(3) yet, but working on it.
             </p>
             <div className="flex items-center gap-4">
-              <Link href="/privacy" className="text-xs text-gray-500 hover:text-amber-500">
+              <Link href="/privacy" className={`text-xs text-gray-500 ${hoverColor}`}>
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-xs text-gray-500 hover:text-amber-500">
+              <Link href="/terms" className={`text-xs text-gray-500 ${hoverColor}`}>
                 Terms of Service
               </Link>
               <p className="text-xs text-gray-500">
-                © {new Date().getFullYear()} {siteConfig.name}
+                © {new Date().getFullYear()} PawsNClaws
               </p>
             </div>
           </div>
