@@ -1,3 +1,10 @@
+export interface CityRepresentative {
+  name: string;
+  title: string;
+  photo?: string; // Path to image in /public
+  bio?: string; // One-liner
+}
+
 export interface CityConfig {
   slug: string;
   name: string;
@@ -14,6 +21,7 @@ export interface CityConfig {
     phone: string;
   }[];
   email: string;
+  representatives: CityRepresentative[];
 }
 
 export const cities: Record<string, CityConfig> = {
@@ -41,6 +49,13 @@ export const cities: Record<string, CityConfig> = {
       { name: "Emergency Vets", phone: "/resources#emergency" },
     ],
     email: "hello@pawsandclawsatx.com",
+    representatives: [
+      {
+        name: "Bryan Moore",
+        title: "Founder & Austin Lead",
+        bio: "Keeping Austin pets and people together since 2024.",
+      },
+    ],
   },
   charlotte: {
     slug: "charlotte",
@@ -66,6 +81,15 @@ export const cities: Record<string, CityConfig> = {
       { name: "VEG Charlotte", phone: "(980) 880-6062" },
     ],
     email: "charlotte@pawsandclawsatx.com",
+    // Add your Charlotte rep here:
+    // representatives: [
+    //   {
+    //     name: "Name Here",
+    //     title: "Charlotte City Lead",
+    //     bio: "Short bio here.",
+    //   },
+    // ],
+    representatives: [],
   },
 };
 
