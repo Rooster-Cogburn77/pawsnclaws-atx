@@ -10,16 +10,18 @@ const cities = [
     status: "active",
     color: "amber",
     url: "/",
-    stats: { colonies: 4, cats: 188 },
+    tagline: "Our founding chapter",
+    stats: { resources: 50, colonies: 4 },
   },
   {
     id: "charlotte",
     name: "Charlotte",
     state: "NC",
-    status: "coming-soon",
+    status: "active",
     color: "teal",
     url: "/cities/charlotte",
-    stats: null,
+    tagline: "The Queen City chapter",
+    stats: { resources: 35 },
   },
 ];
 
@@ -28,20 +30,13 @@ const upcomingCities = [
   { name: "Portland", state: "OR" },
   { name: "Phoenix", state: "AZ" },
   { name: "San Antonio", state: "TX" },
+  { name: "Nashville", state: "TN" },
+  { name: "Raleigh", state: "NC" },
 ];
 
 export default function CitiesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-amber-600 hover:text-amber-700 text-sm">
-            ← Back to PawsNClaws ATX
-          </Link>
-        </div>
-      </header>
-
       {/* Hero */}
       <section className="bg-gradient-to-r from-amber-500 to-orange-500 py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
@@ -49,16 +44,16 @@ export default function CitiesPage() {
             PawsNClaws Cities
           </h1>
           <p className="text-xl text-amber-100 max-w-2xl mx-auto">
-            Community cat support is expanding across America.
+            Community pet support is expanding across America.
             Find your city or help us launch in a new location.
           </p>
         </div>
       </section>
 
-      {/* Active & Coming Soon Cities */}
+      {/* Active Cities */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Our Cities</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">Active Cities</h2>
 
           <div className="grid md:grid-cols-2 gap-6 mb-16">
             {cities.map((city) => (
@@ -66,7 +61,7 @@ export default function CitiesPage() {
                 key={city.id}
                 href={city.url}
                 className={`block bg-white rounded-xl shadow-sm border-2 p-6 transition-all hover:shadow-md ${
-                  city.status === "active"
+                  city.color === "amber"
                     ? "border-amber-200 hover:border-amber-400"
                     : "border-teal-200 hover:border-teal-400"
                 }`}
@@ -76,50 +71,75 @@ export default function CitiesPage() {
                     <h3 className="text-2xl font-bold text-gray-900">
                       {city.name}, {city.state}
                     </h3>
-                    <p className={`text-sm font-medium ${
-                      city.status === "active" ? "text-green-600" : "text-teal-600"
-                    }`}>
-                      {city.status === "active" ? "Active" : "Coming Soon"}
-                    </p>
+                    <p className="text-sm text-gray-600">{city.tagline}</p>
                   </div>
-                  <span className={`text-4xl`}>
-                    {city.status === "active" ? "🐱" : "🚀"}
+                  <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+                    city.color === "amber"
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-teal-100 text-teal-700"
+                  }`}>
+                    ACTIVE
                   </span>
                 </div>
 
                 {city.stats && (
                   <div className="flex gap-6 text-sm text-gray-600">
-                    <span>{city.stats.colonies} colonies mapped</span>
-                    <span>{city.stats.cats} cats supported</span>
+                    {city.stats.resources && (
+                      <span>{city.stats.resources}+ resources listed</span>
+                    )}
+                    {city.stats.colonies && (
+                      <span>{city.stats.colonies} colonies mapped</span>
+                    )}
                   </div>
                 )}
 
-                {city.status === "coming-soon" && (
-                  <p className="text-sm text-gray-500">
-                    Sign up to be notified when we launch →
-                  </p>
-                )}
+                <p className={`mt-4 text-sm font-medium ${
+                  city.color === "amber" ? "text-amber-600" : "text-teal-600"
+                }`}>
+                  View {city.name} →
+                </p>
               </Link>
             ))}
           </div>
 
-          {/* Upcoming */}
+          {/* On Our Radar */}
           <h2 className="text-2xl font-bold text-gray-900 mb-4">On Our Radar</h2>
           <p className="text-gray-600 mb-6">
             These cities are on our expansion wishlist. Want to help launch one?
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {upcomingCities.map((city) => (
-              <div
+              <Link
                 key={city.name}
-                className="bg-white rounded-lg border p-4 text-center"
+                href={`/cities/request?city=${encodeURIComponent(city.name)}&state=${encodeURIComponent(city.state)}`}
+                className="bg-white rounded-lg border p-4 text-center hover:border-amber-300 hover:shadow-sm transition-all"
               >
                 <p className="font-medium text-gray-900">{city.name}</p>
                 <p className="text-sm text-gray-500">{city.state}</p>
-              </div>
+              </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Request Your City */}
+      <section className="bg-amber-50 py-16">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <span className="text-5xl mb-4 block">🌎</span>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Don't See Your City?
+          </h2>
+          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+            Let us know where you'd like to see PawsNClaws next.
+            The more requests we get, the higher priority a city becomes.
+          </p>
+          <Link
+            href="/cities/request"
+            className="inline-block px-8 py-4 bg-amber-500 text-white font-bold text-lg rounded-xl hover:bg-amber-600 transition-colors"
+          >
+            Request Your City
+          </Link>
         </div>
       </section>
 
@@ -127,27 +147,25 @@ export default function CitiesPage() {
       <section className="bg-gray-900 py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Start PawsNClaws in Your City
+            Ready to Lead?
           </h2>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Our open-source playbook and code make it easy to launch community cat
-            support anywhere. We provide the tools, you provide the passion.
+            Each city needs a local champion. If you're passionate about helping
+            pets and people in your community, we'd love to talk.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/contact?subject=new-city"
+              href="/volunteer/city-lead"
               className="px-6 py-3 bg-amber-500 text-white font-medium rounded-lg hover:bg-amber-600 transition-colors"
             >
-              Express Interest
+              Become a City Lead
             </Link>
-            <a
-              href="https://github.com/pawsnclaws/pawsnclaws-template"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/about"
               className="px-6 py-3 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-600 transition-colors"
             >
-              View on GitHub
-            </a>
+              Learn About Us
+            </Link>
           </div>
         </div>
       </section>
