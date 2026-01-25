@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     "volunteer",
     "animal shelter",
   ],
-  metadataBase: new URL("https://pawsnclaws.org"),
+  metadataBase: new URL("https://pawsandclawsatx.com"),
   openGraph: {
     title: siteConfig.name,
     description: siteConfig.description,
