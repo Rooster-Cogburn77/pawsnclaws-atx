@@ -18,19 +18,19 @@ export default function AboutPage() {
         </div>
 
         {/* Content */}
-        <div className="prose prose-lg prose-gray max-w-none">
-          <p className="lead text-xl text-gray-600">
+        <div className="max-w-none">
+          <p className="text-xl text-gray-600 leading-relaxed mb-10">
             PawsNClaws ATX started simply: someone who feeds stray cats wanted
             to help more animals and connect with others doing the same.
           </p>
 
-          <h2>What We Are</h2>
-          <p>
+          <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">What We Are</h2>
+          <p className="text-gray-700 leading-relaxed mb-4">
             We&apos;re a <strong>community resource hub</strong>, not a shelter or
             rescue. We don&apos;t have a facility, and we don&apos;t take in animals
             directly. Instead, we:
           </p>
-          <ul>
+          <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6 ml-4">
             <li>
               <strong>Connect people with resources</strong> - Low-cost vets,
               pet food assistance, TNR programs
@@ -45,63 +45,63 @@ export default function AboutPage() {
             </li>
           </ul>
 
-          <h2>Why Austin?</h2>
-          <p>
+          <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">Why Austin?</h2>
+          <p className="text-gray-700 leading-relaxed mb-4">
             Austin has been a{" "}
             <strong>no-kill city since 2011</strong> - meaning our shelters
             maintain a 90%+ live outcome rate. This incredible achievement is
             only possible because of:
           </p>
-          <ul>
+          <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4 ml-4">
             <li>Dedicated shelter staff and volunteers</li>
             <li>Foster families opening their homes</li>
             <li>Community members feeding and caring for strays</li>
             <li>Donors funding medical care and operations</li>
             <li>TNR programs humanely managing cat populations</li>
           </ul>
-          <p>
+          <p className="text-gray-700 leading-relaxed mb-6">
             We want to make it easier for anyone to join this network of care.
           </p>
 
-          <h2>Community Cats</h2>
-          <p>
+          <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">Community Cats</h2>
+          <p className="text-gray-700 leading-relaxed mb-4">
             A big part of what we care about is{" "}
             <strong>community cats</strong> - the ferals and strays that live in
             our neighborhoods. Austin has an estimated 70,000+ community cats.
           </p>
-          <p>
+          <p className="text-gray-700 leading-relaxed mb-4">
             These cats are managed through{" "}
             <strong>TNR (Trap-Neuter-Return)</strong>: cats are humanely trapped,
             spayed/neutered, and returned to their colony. This stabilizes
             populations, reduces nuisance behaviors, and is more effective than
             removal.
           </p>
-          <p>
+          <p className="text-gray-700 leading-relaxed mb-6">
             Colony caretakers - people who regularly feed and monitor community
             cats - are essential to this system. If you&apos;re feeding strays,
             you&apos;re already part of the solution.
           </p>
 
-          <h2>Our Approach</h2>
-          <div className="bg-amber-50 rounded-xl p-6 not-prose my-8">
+          <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">Our Approach</h2>
+          <div className="bg-amber-50 rounded-xl p-6 my-8">
             <blockquote className="text-xl text-amber-900 font-medium italic">
               &ldquo;We&apos;re not trying to build an empire. We just want to make it
               easier for people who care about animals to help.&rdquo;
             </blockquote>
           </div>
-          <p>
+          <p className="text-gray-700 leading-relaxed mb-6">
             This site is intentionally simple. We&apos;d rather have accurate,
             useful information than flashy features. If a link is broken or
             info is outdated, let us know.
           </p>
 
-          <h2>Get in Touch</h2>
-          <p>
+          <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">Get in Touch</h2>
+          <p className="text-gray-700 leading-relaxed mb-4">
             Have a resource we should add? Found an error? Want to collaborate?
             We&apos;d love to hear from you.
           </p>
-          <p>
-            <em>(Contact form coming soon)</em>
+          <p className="text-gray-500 italic">
+            (Contact form coming soon)
           </p>
         </div>
 
