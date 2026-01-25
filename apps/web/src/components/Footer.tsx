@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { siteConfig } from "@/data/site-config";
+import { useState } from "react";
 
 const footerLinks = {
   getHelp: [
@@ -26,6 +29,38 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus("loading");
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus("success");
+        setMessage(data.message || "You're subscribed!");
+        setEmail("");
+      } else {
+        setStatus("error");
+        setMessage(data.error || "Something went wrong");
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Network error. Please try again.");
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Newsletter Section */}
@@ -40,19 +75,33 @@ export function Footer() {
                 Get updates on events, success stories, and ways to help.
               </p>
             </div>
-            <form className="flex gap-2 w-full md:w-auto">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                className="px-4 py-2 rounded-lg flex-1 md:w-64 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
-              >
-                Subscribe
-              </button>
-            </form>
+            {status === "success" ? (
+              <div className="flex items-center gap-2 text-white font-medium">
+                <span>✓</span> {message}
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex gap-2 w-full md:w-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="px-4 py-2 rounded-lg flex-1 md:w-64 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  disabled={status === "loading"}
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="px-6 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50"
+                >
+                  {status === "loading" ? "..." : "Subscribe"}
+                </button>
+              </form>
+            )}
+            {status === "error" && (
+              <p className="text-red-100 text-sm">{message}</p>
+            )}
           </div>
         </div>
       </div>

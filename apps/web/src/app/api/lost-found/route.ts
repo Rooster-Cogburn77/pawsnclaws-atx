@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { sendEmail, emailTemplates } from "@/lib/email";
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,7 +62,73 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // TODO: Send notification email
+    // Send notification email to admin
+    await sendEmail({
+      to: ADMIN_EMAIL,
+      subject: `[${isLost ? "Lost" : "Found"} Pet] ${species}${name ? ` named ${name}` : ""} - ${location}`,
+      html: emailTemplates.base(`
+        <h2>${isLost ? "Lost" : "Found"} Pet Report</h2>
+        <div style="background: ${isLost ? '#fef2f2' : '#f0fdf4'}; border: 1px solid ${isLost ? '#fecaca' : '#bbf7d0'}; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+          <strong style="color: ${isLost ? '#dc2626' : '#16a34a'};">${isLost ? "LOST" : "FOUND"}</strong>
+        </div>
+        <p><strong>Species:</strong> ${species}</p>
+        ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
+        <p><strong>Breed:</strong> ${breed || "Unknown"}</p>
+        <p><strong>Color:</strong> ${color}</p>
+        <p><strong>Location:</strong> ${location}</p>
+        ${microchipId ? `<p><strong>Microchip ID:</strong> ${microchipId}</p>` : ''}
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p><strong>Description:</strong></p>
+        <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
+          ${description.replace(/\n/g, '<br>')}
+        </div>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p><strong>Contact:</strong> ${contactName}</p>
+        ${contactPhone ? `<p><strong>Phone:</strong> ${contactPhone}</p>` : ''}
+        ${contactEmail ? `<p><strong>Email:</strong> ${contactEmail}</p>` : ''}
+        <a href="https://pawsnclaws.org/lost-found" class="button">View All Reports</a>
+      `),
+    });
+
+    // Send confirmation to reporter if email provided
+    if (contactEmail) {
+      await sendEmail({
+        to: contactEmail,
+        subject: `Your ${isLost ? "Lost" : "Found"} Pet Report - PawsNClaws ATX`,
+        html: emailTemplates.base(`
+          <h2>Report Received</h2>
+          <p>Hi ${contactName},</p>
+          <p>We've received your ${isLost ? "lost" : "found"} pet report and it's now visible on our <a href="https://pawsnclaws.org/lost-found">Lost & Found board</a>.</p>
+
+          <h3>Your Report:</h3>
+          <ul>
+            <li><strong>Type:</strong> ${species}${breed ? ` (${breed})` : ''}</li>
+            <li><strong>Color:</strong> ${color}</li>
+            <li><strong>Location:</strong> ${location}</li>
+          </ul>
+
+          ${isLost ? `
+          <h3>Tips for Finding Your Pet:</h3>
+          <ul>
+            <li>Search your neighborhood at dawn and dusk when it's quieter</li>
+            <li>Leave out familiar-smelling items (bedding, clothes)</li>
+            <li>Post on Nextdoor, local Facebook groups, and Pawboost</li>
+            <li>Contact local shelters daily</li>
+            <li>Check Austin Animal Center: (512) 978-0500</li>
+          </ul>
+          ` : `
+          <h3>If You've Found a Pet:</h3>
+          <ul>
+            <li>Take them to any vet to scan for a microchip (free)</li>
+            <li>Post on Nextdoor and local Facebook groups</li>
+            <li>Contact Austin Animal Center: (512) 978-0500</li>
+          </ul>
+          `}
+
+          <p>We hope for a happy reunion!</p>
+        `),
+      });
+    }
 
     return NextResponse.json({
       success: true,

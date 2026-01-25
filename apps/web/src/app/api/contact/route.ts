@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { emails } from "@/lib/email";
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,8 +37,16 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // TODO: Send notification email to admin
-    // TODO: Send confirmation email to sender
+    // Send notification email to admin
+    await emails.sendContactNotification(ADMIN_EMAIL, {
+      name,
+      email,
+      subject: reason || "General Inquiry",
+      message,
+    });
+
+    // Send confirmation email to sender
+    await emails.sendContactConfirmation(email, name);
 
     return NextResponse.json({
       success: true,

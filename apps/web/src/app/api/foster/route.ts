@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { emails, sendEmail, emailTemplates } from "@/lib/email";
+
+const FOSTER_COORDINATOR_EMAIL = process.env.FOSTER_COORDINATOR_EMAIL || process.env.ADMIN_EMAIL || "foster@pawsnclaws.org";
+
+// Map foster type IDs to readable names
+const fosterTypeLabels: Record<string, string> = {
+  "bottle-baby": "Bottle Baby Kittens",
+  "weaned-kittens": "Weaned Kittens",
+  "adult-cats": "Adult Cats",
+  "dogs": "Dogs",
+  "medical": "Medical Foster",
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,8 +68,33 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // TODO: Send welcome email with next steps
-    // TODO: Send notification to foster coordinator
+    // Get readable foster types
+    const fosterTypesReadable = (fosterType || [])
+      .map((type: string) => fosterTypeLabels[type] || type)
+      .join(", ");
+
+    // Send welcome email with next steps
+    await emails.sendFosterWelcome(email, name, fosterTypesReadable || "General Foster");
+
+    // Send notification to foster coordinator
+    await sendEmail({
+      to: FOSTER_COORDINATOR_EMAIL,
+      subject: `[New Foster Application] ${name}`,
+      html: emailTemplates.base(`
+        <h2>New Foster Application</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Foster Types:</strong> ${fosterTypesReadable || "None specified"}</p>
+        <p><strong>Housing:</strong> ${housingType || "Not specified"}</p>
+        <p><strong>Has Other Pets:</strong> ${hasOtherPets ? "Yes" : "No"}</p>
+        <p><strong>Has Kids:</strong> ${hasKids ? "Yes" : "No"}</p>
+        ${experience ? `<p><strong>Experience:</strong> ${experience}</p>` : ""}
+        ${whyFoster ? `<p><strong>Why They Want to Foster:</strong></p><div style="background: #f9fafb; padding: 15px; border-radius: 8px;">${whyFoster}</div>` : ""}
+        <a href="mailto:${email}" class="button">Contact ${name}</a>
+      `),
+      replyTo: email,
+    });
 
     return NextResponse.json({
       success: true,

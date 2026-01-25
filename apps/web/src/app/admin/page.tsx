@@ -71,6 +71,14 @@ const dashboardItems = [
     count: 0,
     color: "bg-rose-50 border-rose-200",
   },
+  {
+    title: "Newsletter",
+    emoji: "📧",
+    href: "/admin/newsletter",
+    description: "Manage newsletter subscribers",
+    count: 0,
+    color: "bg-cyan-50 border-cyan-200",
+  },
 ];
 
 export default function AdminDashboard() {
@@ -228,6 +236,12 @@ export default function AdminDashboard() {
                   <li>STRIPE_SECRET_KEY</li>
                   <li>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</li>
                   <li>STRIPE_WEBHOOK_SECRET</li>
+                </ul>
+              </li>
+              <li>For email notifications (optional), add Resend key:
+                <ul className="list-disc list-inside ml-4 mt-1">
+                  <li>RESEND_API_KEY (from resend.com)</li>
+                  <li>ADMIN_EMAIL (notifications recipient)</li>
                 </ul>
               </li>
             </ol>

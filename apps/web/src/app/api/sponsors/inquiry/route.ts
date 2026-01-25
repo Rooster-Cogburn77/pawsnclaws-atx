@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { emails, sendEmail, emailTemplates } from "@/lib/email";
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
+
+const tierLabels: Record<string, string> = {
+  bronze: "Bronze ($500/year)",
+  silver: "Silver ($1,000/year)",
+  gold: "Gold ($2,500/year)",
+  platinum: "Platinum ($5,000/year)",
+  champion: "Champion ($10,000+/year)",
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,8 +62,33 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // TODO: Send notification email to admin
-    // TODO: Send confirmation email to sponsor
+    // Send confirmation email to sponsor
+    await emails.sendSponsorConfirmation(contactEmail, companyName);
+
+    // Send notification email to admin
+    await sendEmail({
+      to: ADMIN_EMAIL,
+      subject: `[New Sponsor Inquiry] ${companyName} - ${tierLabels[tier] || tier}`,
+      html: emailTemplates.base(`
+        <h2>New Sponsor Partnership Inquiry</h2>
+        <p><strong>Company:</strong> ${companyName}</p>
+        <p><strong>Website:</strong> ${website ? `<a href="${website}">${website}</a>` : "Not provided"}</p>
+        <p><strong>Interested Tier:</strong> ${tierLabels[tier] || tier}</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p><strong>Contact:</strong> ${contactName}</p>
+        <p><strong>Email:</strong> ${contactEmail}</p>
+        <p><strong>Phone:</strong> ${contactPhone || "Not provided"}</p>
+        ${message ? `
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+        <p><strong>Message:</strong></p>
+        <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
+          ${message.replace(/\n/g, '<br>')}
+        </div>
+        ` : ''}
+        <a href="mailto:${contactEmail}" class="button" style="margin-top: 20px;">Contact ${contactName}</a>
+      `),
+      replyTo: contactEmail,
+    });
 
     return NextResponse.json({
       success: true,
