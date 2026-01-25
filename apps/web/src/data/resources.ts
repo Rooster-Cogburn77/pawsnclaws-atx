@@ -119,6 +119,13 @@ export const resourceCategories: ResourceCategory[] = [
         tags: ["tnr", "community-cats", "ut-austin", "volunteer"],
       },
       {
+        name: "Meow Mates (UT Student Org)",
+        description: "Student organization (~20 students) helping care for stray cats in the West Campus area near UT Austin.",
+        address: "West Campus, Austin, TX",
+        website: "https://thedailytexan.com/2024/09/15/a-helping-hand-students-start-new-organization-to-take-care-of-west-campus-stray-cats/",
+        tags: ["community-cats", "ut-austin", "volunteer", "west-campus", "students"],
+      },
+      {
         name: "Shadow Cats Rescue",
         description: "TNR assistance and feral cat resources in Round Rock area",
         address: "PO Box 720, Round Rock, TX 78680",
