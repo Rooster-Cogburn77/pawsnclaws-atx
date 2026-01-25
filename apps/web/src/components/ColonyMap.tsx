@@ -115,7 +115,7 @@ export default function ColonyMap({
           }}
         >
           <Popup>
-            <div className="min-w-[200px]">
+            <div className="min-w-[240px]">
               <h3 className="font-bold text-gray-900 mb-1">{colony.name}</h3>
               <p className="text-sm text-gray-600 mb-2">{colony.location_name}</p>
               <div className="flex justify-between text-sm mb-2">
@@ -127,10 +127,33 @@ export default function ColonyMap({
               {colony.description && (
                 <p className="text-xs text-gray-500 mt-2">{colony.description}</p>
               )}
-              <div className="mt-3 pt-2 border-t">
-                <span className="text-amber-600 font-medium text-sm">
+              <div className="mt-3 pt-3 border-t">
+                <p className="text-amber-600 font-medium text-sm mb-3">
                   ${colony.monthly_food_cost / 100}/mo to sponsor
-                </span>
+                </p>
+                <div className="flex gap-2">
+                  <a
+                    href={`/donate?colony=${colony.id}&amount=${colony.monthly_food_cost}`}
+                    className="flex-1 px-3 py-1.5 bg-amber-500 text-white text-xs font-medium rounded-lg text-center hover:bg-amber-600 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Sponsor
+                  </a>
+                  <a
+                    href="/donate"
+                    className="flex-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg text-center hover:bg-gray-200 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Donate
+                  </a>
+                  <a
+                    href={`/volunteer?colony=${colony.id}`}
+                    className="flex-1 px-3 py-1.5 bg-green-500 text-white text-xs font-medium rounded-lg text-center hover:bg-green-600 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Volunteer
+                  </a>
+                </div>
               </div>
             </div>
           </Popup>

@@ -161,6 +161,124 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Corporate Partners Section */}
+      <section className="py-16 bg-gray-900">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="text-amber-400 font-medium text-sm uppercase tracking-wider">
+                For Businesses
+              </span>
+              <h2 className="text-3xl font-bold text-white mt-2 mb-4">
+                Corporate Partnership Opportunities
+              </h2>
+              <p className="text-gray-300 mb-6">
+                Partner with PawsNClaws ATX to make a meaningful impact on animal
+                welfare while engaging your employees and community. We offer
+                flexible partnership options for companies of all sizes.
+              </p>
+              <ul className="space-y-3 text-gray-300 mb-8">
+                <li className="flex items-center gap-2">
+                  <span className="text-amber-400">✓</span>
+                  Matching gift programs & workplace giving
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-amber-400">✓</span>
+                  Team volunteer events & foster programs
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-amber-400">✓</span>
+                  Colony sponsorship & naming opportunities
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-amber-400">✓</span>
+                  Foster Friendly Workplace certification
+                </li>
+              </ul>
+              <Link
+                href="/corporate"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-white font-semibold rounded-lg hover:bg-amber-600 transition-colors"
+              >
+                Explore Partnerships
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-800 rounded-xl p-6 text-center">
+                <div className="text-3xl mb-2">🏢</div>
+                <div className="text-2xl font-bold text-amber-400">2:1</div>
+                <p className="text-sm text-gray-400 mt-1">Avg employer match</p>
+              </div>
+              <div className="bg-gray-800 rounded-xl p-6 text-center">
+                <div className="text-3xl mb-2">👥</div>
+                <div className="text-2xl font-bold text-amber-400">100%</div>
+                <p className="text-sm text-gray-400 mt-1">Tax deductible</p>
+              </div>
+              <div className="bg-gray-800 rounded-xl p-6 text-center">
+                <div className="text-3xl mb-2">🐱</div>
+                <div className="text-2xl font-bold text-amber-400">$150</div>
+                <p className="text-sm text-gray-400 mt-1">Sponsors 1 colony/mo</p>
+              </div>
+              <div className="bg-gray-800 rounded-xl p-6 text-center">
+                <div className="text-3xl mb-2">💼</div>
+                <div className="text-2xl font-bold text-amber-400">ESG</div>
+                <p className="text-sm text-gray-400 mt-1">Impact reporting</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Partners */}
+      <section className="py-16 bg-white border-t">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">
+            Community Partners
+          </h2>
+          <p className="text-center text-gray-600 mb-10">
+            Working together to support Austin&apos;s community cats
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            <a
+              href="https://www.austintexas.gov/page/community-cats"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block p-6 bg-gray-50 rounded-xl hover:bg-amber-50 transition-colors text-center"
+            >
+              <div className="text-3xl mb-3">🏛️</div>
+              <h3 className="font-bold text-gray-900">Austin Animal Center</h3>
+              <p className="text-sm text-gray-600 mt-1">Official city TNR program partner</p>
+            </a>
+            <a
+              href="https://thedailytexan.com/2015/11/25/ut-policies-control-campus-cat-colonies/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block p-6 bg-gray-50 rounded-xl hover:bg-amber-50 transition-colors text-center"
+            >
+              <div className="text-3xl mb-3">🎓</div>
+              <h3 className="font-bold text-gray-900">Campus Cat Coalition</h3>
+              <p className="text-sm text-gray-600 mt-1">UT Austin campus colony caretakers</p>
+            </a>
+            <a
+              href="https://austinhumanesociety.org/programs/community-cat-program/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block p-6 bg-gray-50 rounded-xl hover:bg-amber-50 transition-colors text-center"
+            >
+              <div className="text-3xl mb-3">💙</div>
+              <h3 className="font-bold text-gray-900">Austin Humane Society</h3>
+              <p className="text-sm text-gray-600 mt-1">Community cat program since 2007</p>
+            </a>
+          </div>
+          <p className="text-center text-sm text-gray-500 mt-8">
+            Want to partner with us?{" "}
+            <Link href="/contact?subject=partnership" className="text-amber-600 hover:text-amber-700">
+              Get in touch →
+            </Link>
+          </p>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-amber-500">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
