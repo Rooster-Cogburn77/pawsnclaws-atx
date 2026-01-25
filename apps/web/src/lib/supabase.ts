@@ -2,6 +2,69 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 let supabaseInstance: SupabaseClient | null = null;
 
+// Mock query builder interface for build-time compatibility
+interface MockQueryBuilder {
+  select: (columns?: string) => MockQueryBuilder;
+  insert: (data: unknown) => Promise<{ data: null; error: null }>;
+  update: (data?: unknown) => MockQueryBuilder;
+  upsert: (data: unknown, opts?: unknown) => Promise<{ data: null; error: null }>;
+  delete: () => MockQueryBuilder;
+  eq: (column: string, value: unknown) => MockQueryBuilder;
+  neq: (column: string, value: unknown) => MockQueryBuilder;
+  gt: (column: string, value: unknown) => MockQueryBuilder;
+  gte: (column: string, value: unknown) => MockQueryBuilder;
+  lt: (column: string, value: unknown) => MockQueryBuilder;
+  lte: (column: string, value: unknown) => MockQueryBuilder;
+  like: (column: string, value: unknown) => MockQueryBuilder;
+  ilike: (column: string, value: unknown) => MockQueryBuilder;
+  is: (column: string, value: unknown) => MockQueryBuilder;
+  in: (column: string, values: unknown[]) => MockQueryBuilder;
+  contains: (column: string, value: unknown) => MockQueryBuilder;
+  containedBy: (column: string, value: unknown) => MockQueryBuilder;
+  order: (column: string, opts?: { ascending?: boolean }) => MockQueryBuilder;
+  limit: (count: number) => MockQueryBuilder;
+  range: (from: number, to: number) => MockQueryBuilder;
+  single: () => Promise<{ data: null; error: null }>;
+  maybeSingle: () => Promise<{ data: null; error: null }>;
+  then: <T>(resolve: (value: { data: unknown[]; error: null }) => T) => Promise<T>;
+}
+
+// Create a chainable mock query builder for build-time compatibility
+const createMockQueryBuilder = (table: string): MockQueryBuilder => {
+  const mockResult = { data: [] as unknown[], error: null };
+
+  const builder: MockQueryBuilder = {
+    select: () => builder,
+    insert: async (data: unknown) => {
+      console.log(`[Mock] Would insert into ${table}:`, data);
+      return { data: null, error: null };
+    },
+    update: () => builder,
+    upsert: async () => ({ data: null, error: null }),
+    delete: () => builder,
+    eq: () => builder,
+    neq: () => builder,
+    gt: () => builder,
+    gte: () => builder,
+    lt: () => builder,
+    lte: () => builder,
+    like: () => builder,
+    ilike: () => builder,
+    is: () => builder,
+    in: () => builder,
+    contains: () => builder,
+    containedBy: () => builder,
+    order: () => builder,
+    limit: () => builder,
+    range: () => builder,
+    single: async () => ({ data: null, error: null }),
+    maybeSingle: async () => ({ data: null, error: null }),
+    then: (resolve) => Promise.resolve(mockResult).then(resolve),
+  };
+
+  return builder;
+};
+
 // Client-side Supabase (lazy initialization)
 export const getSupabase = () => {
   if (!supabaseInstance) {
@@ -23,20 +86,8 @@ export const supabase = {
   from: (table: string) => {
     const client = getSupabase();
     if (!client) {
-      // Return a mock that logs but doesn't fail
-      return {
-        insert: async (data: unknown) => {
-          console.log(`[Mock] Would insert into ${table}:`, data);
-          return { data: null, error: null };
-        },
-        select: () => ({
-          single: async () => ({ data: null, error: null }),
-        }),
-        update: () => ({
-          eq: async () => ({ data: null, error: null }),
-        }),
-        upsert: async () => ({ data: null, error: null }),
-      };
+      // Return chainable mock
+      return createMockQueryBuilder(table);
     }
     return client.from(table);
   },
@@ -49,21 +100,9 @@ export const createServerSupabase = () => {
 
   if (!supabaseUrl || !supabaseServiceKey) {
     console.warn("Supabase server credentials not configured");
-    // Return a mock client
+    // Return a mock client with chainable query builder
     return {
-      from: (table: string) => ({
-        insert: async (data: unknown) => {
-          console.log(`[Mock] Would insert into ${table}:`, data);
-          return { data: null, error: null };
-        },
-        select: () => ({
-          single: async () => ({ data: null, error: null }),
-        }),
-        update: () => ({
-          eq: async () => ({ data: null, error: null }),
-        }),
-        upsert: async (_data: unknown, _opts?: unknown) => ({ data: null, error: null }),
-      }),
+      from: (table: string) => createMockQueryBuilder(table),
     };
   }
 
