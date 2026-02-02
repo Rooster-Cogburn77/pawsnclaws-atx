@@ -20,10 +20,6 @@ body {
   color: var(--foreground);
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
 
 /* Focus styles for accessibility */
 *:focus-visible {
