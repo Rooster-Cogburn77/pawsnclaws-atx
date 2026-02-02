@@ -15,17 +15,18 @@ export function ScrollToTop() {
       history.scrollRestoration = "manual";
     }
 
-    // Immediate scroll
+    // Scroll immediately
     window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
 
-    // Also scroll after a tick (for layout shifts)
+    // Scroll after paint
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+    });
+
+    // Scroll after a short delay (catch any layout shifts)
     const timer = setTimeout(() => {
       window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }, 0);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [pathname]);
