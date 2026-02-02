@@ -3,8 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml, sanitizePhone } from "@/lib/sanitize";
 import { surrenderPreventionSchema } from "@/lib/validations";
-
-const VOLUNTEER_COORDINATOR_EMAIL = process.env.VOLUNTEER_COORDINATOR_EMAIL || process.env.ADMIN_EMAIL || "coordinator@pawsnclaws.org";
+import { getCityBySlug } from "@/config/cities";
 
 // Map reason IDs to readable labels
 const reasonLabels: Record<string, string> = {
@@ -46,6 +45,8 @@ export async function POST(request: NextRequest) {
       whatWouldHelp,
       triedOptions,
     } = result.data;
+    const city = body.city as string | undefined;
+    const cityConfig = getCityBySlug(city);
 
     // Map reasons to readable text
     const reasonTexts = (reasons || []).map(r => reasonLabels[r] || r);
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
         reason: reasonText,
         assistance_needed: whatWouldHelp || null,
         status: "new",
+        city: cityConfig.slug,
         notes: JSON.stringify({
           timeline,
           triedOptions,
@@ -87,11 +89,11 @@ export async function POST(request: NextRequest) {
     // Readable reasons
     const readableReason = reasonText;
 
-    // Send alert email to volunteer coordinator (with sanitized content)
+    // Send alert email to city coordinator (with sanitized content)
     const sanitizedPhone = sanitizePhone(phone || "");
     await sendEmail({
-      to: VOLUNTEER_COORDINATOR_EMAIL,
-      subject: `${isUrgent ? "[URGENT] " : ""}Surrender Prevention Case: ${escapeHtml(name)}`,
+      to: cityConfig.email,
+      subject: `[${cityConfig.shortName}] ${isUrgent ? "[URGENT] " : ""}Surrender Prevention Case: ${escapeHtml(name)}`,
       html: emailTemplates.base(`
         ${isUrgent ? '<div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin-bottom: 20px;"><strong style="color: #dc2626;">URGENT CASE</strong> - Person needs help within 48 hours</div>' : ''}
         <h2>Surrender Prevention Case</h2>

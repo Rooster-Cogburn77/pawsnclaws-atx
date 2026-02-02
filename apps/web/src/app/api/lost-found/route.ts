@@ -3,8 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
 import { lostFoundSchema } from "@/lib/validations";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
+import { getCityBySlug } from "@/config/cities";
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,6 +35,8 @@ export async function POST(request: NextRequest) {
       contactEmail,
       microchipId,
     } = result.data;
+    const city = body.city as string | undefined;
+    const cityConfig = getCityBySlug(city);
 
     const supabase = createServerSupabase();
 
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
         microchip_id: microchipId || null,
         status: "active",
         photos: [],
+        city: cityConfig.slug,
       });
 
       if (result.error) {
@@ -71,10 +73,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Send notification email to admin (with sanitized content)
+    // Send notification email to city admin (with sanitized content)
     await sendEmail({
-      to: ADMIN_EMAIL,
-      subject: `[${isLost ? "Lost" : "Found"} Pet] ${escapeHtml(species)}${name ? ` named ${escapeHtml(name)}` : ""} - ${escapeHtml(location)}`,
+      to: cityConfig.email,
+      subject: `[${cityConfig.shortName}] [${isLost ? "Lost" : "Found"} Pet] ${escapeHtml(species)}${name ? ` named ${escapeHtml(name)}` : ""} - ${escapeHtml(location)}`,
       html: emailTemplates.base(`
         <h2>${isLost ? "Lost" : "Found"} Pet Report</h2>
         <div style="background: ${isLost ? '#fef2f2' : '#f0fdf4'}; border: 1px solid ${isLost ? '#fecaca' : '#bbf7d0'}; padding: 15px; border-radius: 8px; margin-bottom: 20px;">

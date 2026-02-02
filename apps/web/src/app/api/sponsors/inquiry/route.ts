@@ -3,8 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml, sanitizeUrl } from "@/lib/sanitize";
 import { sponsorInquirySchema } from "@/lib/validations";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
+import { getCityBySlug } from "@/config/cities";
 
 const tierLabels: Record<string, string> = {
   bronze: "Bronze ($500/year)",
@@ -41,6 +40,8 @@ export async function POST(request: NextRequest) {
     } = result.data;
 
     const website = body.website;
+    const city = body.city as string | undefined;
+    const cityConfig = getCityBySlug(city);
 
     const supabase = createServerSupabase();
 
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
         is_active: false, // Pending approval
         display_on_site: false,
         benefits: { inquiry_message: message },
+        city: cityConfig.slug,
       });
 
       if (result.error) {
@@ -75,11 +77,11 @@ export async function POST(request: NextRequest) {
     // Send confirmation email to sponsor
     await emails.sendSponsorConfirmation(contactEmail, companyName);
 
-    // Send notification email to admin (with sanitized content)
+    // Send notification email to city admin (with sanitized content)
     const sanitizedWebsite = website ? sanitizeUrl(website) : "";
     await sendEmail({
-      to: ADMIN_EMAIL,
-      subject: `[New Sponsor Inquiry] ${escapeHtml(companyName)} - ${tierLabels[tier || "bronze"] || tier}`,
+      to: cityConfig.email,
+      subject: `[${cityConfig.shortName}] [New Sponsor Inquiry] ${escapeHtml(companyName)} - ${tierLabels[tier || "bronze"] || tier}`,
       html: emailTemplates.base(`
         <h2>New Sponsor Partnership Inquiry</h2>
         <p><strong>Company:</strong> ${escapeHtml(companyName)}</p>

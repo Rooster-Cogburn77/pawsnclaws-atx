@@ -109,3 +109,12 @@ export function getCityDonateLink(city: CityConfig): string {
 export function getCityHomeLink(city: CityConfig): string {
   return city.slug === "austin" ? "/" : `/cities/${city.slug}`;
 }
+
+/**
+ * Get city config by slug (for API routes)
+ * Returns austin config as fallback if city not found
+ */
+export function getCityBySlug(slug: string | undefined): CityConfig {
+  if (!slug) return cities.austin;
+  return cities[slug] || cities.austin;
+}

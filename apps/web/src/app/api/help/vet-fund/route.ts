@@ -3,8 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
 import { vetFundSchema } from "@/lib/validations";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
+import { getCityBySlug } from "@/config/cities";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,6 +36,8 @@ export async function POST(request: NextRequest) {
       hasAppliedElsewhere,
       otherFunding,
     } = result.data;
+    const city = body.city as string | undefined;
+    const cityConfig = getCityBySlug(city);
 
     const cost = estimatedCost;
     const supabase = createServerSupabase();
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
         vet_clinic: vetClinic,
         diagnosis: diagnosis,
         estimated_cost: cost * 100, // Convert to cents
+        city: cityConfig.slug,
         notes: JSON.stringify({
           situation,
           hasAppliedElsewhere,
@@ -77,10 +79,10 @@ export async function POST(request: NextRequest) {
     // Send confirmation email to requestor
     await emails.sendVetFundConfirmation(email, name, petName);
 
-    // Send notification email to admin (with sanitized content)
+    // Send notification email to city admin (with sanitized content)
     await sendEmail({
-      to: ADMIN_EMAIL,
-      subject: `${isEmergency ? "[EMERGENCY] " : ""}[Vet Fund] $${cost} request for ${escapeHtml(petName)}`,
+      to: cityConfig.email,
+      subject: `[${cityConfig.shortName}] ${isEmergency ? "[EMERGENCY] " : ""}[Vet Fund] $${cost} request for ${escapeHtml(petName)}`,
       html: emailTemplates.base(`
         ${isEmergency ? '<div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin-bottom: 20px;"><strong style="color: #dc2626;">EMERGENCY REQUEST</strong></div>' : ''}
         <h2>Emergency Vet Fund Request</h2>

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { getCityBySlug } from "@/config/cities";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { eventId, eventTitle, eventDate, name, email, phone, notes } = body;
+    const { eventId, eventTitle, eventDate, name, email, phone, notes, city } = body;
+    const cityConfig = getCityBySlug(city);
 
     if (!eventId || !name || !email) {
       return NextResponse.json(
@@ -25,6 +27,7 @@ export async function POST(request: NextRequest) {
         phone: phone || null,
         notes: notes || null,
         status: "registered",
+        city: cityConfig.slug,
       });
 
       if (error) {

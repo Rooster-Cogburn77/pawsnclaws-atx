@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails } from "@/lib/email";
 import { contactSchema } from "@/lib/validations";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
+import { getCityBySlug } from "@/config/cities";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,6 +22,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, reason, message } = result.data;
+    const city = body.city as string | undefined;
+    const cityConfig = getCityBySlug(city);
 
     const supabase = createServerSupabase();
 
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
         reason: reason || "general",
         message,
         status: "new",
+        city: cityConfig.slug,
       });
     } catch {
       // Log for now if DB not configured
@@ -45,11 +47,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Send notification email to admin
-    await emails.sendContactNotification(ADMIN_EMAIL, {
+    // Send notification email to city admin
+    await emails.sendContactNotification(cityConfig.email, {
       name,
       email,
-      subject: reason || "General Inquiry",
+      subject: `[${cityConfig.shortName}] ${reason || "General Inquiry"}`,
       message,
     });
 

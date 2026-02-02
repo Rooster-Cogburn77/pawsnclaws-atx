@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
+import { getCityBySlug } from "@/config/cities";
 import { z } from "zod";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
 // Volunteer signup schema
 const volunteerSignupSchema = z.object({
@@ -17,6 +16,7 @@ const volunteerSignupSchema = z.object({
   hasVehicle: z.boolean().optional(),
   canFoster: z.boolean().optional(),
   message: z.string().max(5000).optional(),
+  city: z.string().optional(),
 });
 
 // Map role IDs to readable names
@@ -56,8 +56,10 @@ export async function POST(request: NextRequest) {
       hasVehicle,
       canFoster,
       message,
+      city,
     } = result.data;
 
+    const cityConfig = getCityBySlug(city);
     const supabase = createServerSupabase();
 
     try {
@@ -70,6 +72,7 @@ export async function POST(request: NextRequest) {
         is_foster_approved: false,
         background_check: false,
         status: "pending",
+        city: cityConfig.slug,
         notes: JSON.stringify({
           experience,
           hasVehicle,
@@ -99,8 +102,8 @@ export async function POST(request: NextRequest) {
 
     // Send notification to admin (with sanitized content)
     await sendEmail({
-      to: ADMIN_EMAIL,
-      subject: `[New Volunteer] ${escapeHtml(name)} signed up`,
+      to: cityConfig.email,
+      subject: `[${cityConfig.shortName}] [New Volunteer] ${escapeHtml(name)} signed up`,
       html: emailTemplates.base(`
         <h2>New Volunteer Signup</h2>
         <p><strong>Name:</strong> ${escapeHtml(name)}</p>

@@ -3,8 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
 import { depositAssistanceSchema } from "@/lib/validations";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
+import { getCityBySlug } from "@/config/cities";
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,6 +34,8 @@ export async function POST(request: NextRequest) {
       canRepay,
       situation,
     } = result.data;
+    const city = body.city as string | undefined;
+    const cityConfig = getCityBySlug(city);
 
     const amount = depositAmount;
     const supabase = createServerSupabase();
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
         landlord_name: landlordName || null,
         deposit_amount: amount * 100, // Convert to cents
         status: "pending",
+        city: cityConfig.slug,
         notes: JSON.stringify({
           monthlyIncome: monthlyIncome ? monthlyIncome * 100 : null,
           canRepay,
@@ -71,10 +73,10 @@ export async function POST(request: NextRequest) {
     // Send confirmation email to applicant
     await emails.sendDepositConfirmation(email, name, amount);
 
-    // Send notification to admin (with sanitized content)
+    // Send notification to city admin (with sanitized content)
     await sendEmail({
-      to: ADMIN_EMAIL,
-      subject: `[Deposit Assistance] $${amount} request from ${escapeHtml(name)}`,
+      to: cityConfig.email,
+      subject: `[${cityConfig.shortName}] [Deposit Assistance] $${amount} request from ${escapeHtml(name)}`,
       html: emailTemplates.base(`
         <h2>New Deposit Assistance Application</h2>
         <p><strong>Applicant:</strong> ${escapeHtml(name)}</p>

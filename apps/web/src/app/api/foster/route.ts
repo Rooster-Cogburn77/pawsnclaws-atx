@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
+import { getCityBySlug } from "@/config/cities";
 import { z } from "zod";
-
-const FOSTER_COORDINATOR_EMAIL = process.env.FOSTER_COORDINATOR_EMAIL || process.env.ADMIN_EMAIL || "foster@pawsnclaws.org";
 
 // Foster application schema
 const fosterApplicationSchema = z.object({
@@ -17,6 +16,7 @@ const fosterApplicationSchema = z.object({
   housingType: z.string().optional(),
   experience: z.string().max(5000).optional(),
   whyFoster: z.string().max(5000).optional(),
+  city: z.string().optional(),
 });
 
 // Map foster type IDs to readable names
@@ -55,8 +55,10 @@ export async function POST(request: NextRequest) {
       housingType,
       experience,
       whyFoster,
+      city,
     } = result.data;
 
+    const cityConfig = getCityBySlug(city);
     const supabase = createServerSupabase();
 
     try {
@@ -68,6 +70,7 @@ export async function POST(request: NextRequest) {
         is_foster_approved: false,
         background_check: false,
         status: "pending",
+        city: cityConfig.slug,
         notes: JSON.stringify({
           applicationType: "foster",
           fosterTypes,
@@ -100,8 +103,8 @@ export async function POST(request: NextRequest) {
 
     // Send notification to foster coordinator (with sanitized content)
     await sendEmail({
-      to: FOSTER_COORDINATOR_EMAIL,
-      subject: `[New Foster Application] ${escapeHtml(name)}`,
+      to: cityConfig.email,
+      subject: `[${cityConfig.shortName}] [New Foster Application] ${escapeHtml(name)}`,
       html: emailTemplates.base(`
         <h2>New Foster Application</h2>
         <p><strong>Name:</strong> ${escapeHtml(name)}</p>

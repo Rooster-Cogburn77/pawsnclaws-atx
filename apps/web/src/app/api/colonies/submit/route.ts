@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails } from "@/lib/email";
 import { colonySubmissionSchema } from "@/lib/validations";
-
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
+import { getCityBySlug } from "@/config/cities";
 
 export async function POST(request: Request) {
   try {
@@ -23,6 +22,8 @@ export async function POST(request: Request) {
     }
 
     const data = result.data;
+    const city = body.city as string | undefined;
+    const cityConfig = getCityBySlug(city);
 
     const supabase = createServerSupabase();
 
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
         submitter_phone: data.submitterPhone,
         submitter_relation: data.submitterRelation,
         status: "pending",
+        city: cityConfig.slug,
       });
     } catch {
       // Log for now if DB not configured
@@ -58,8 +60,8 @@ export async function POST(request: Request) {
       });
     }
 
-    // Send notification email to admin (sanitization handled in email templates)
-    await emails.sendColonySubmissionNotification(ADMIN_EMAIL, {
+    // Send notification email to city admin (sanitization handled in email templates)
+    await emails.sendColonySubmissionNotification(cityConfig.email, {
       colonyName: data.colonyName || "Unnamed Colony",
       location: data.locationDescription,
       estimatedCats: String(data.estimatedCats),
