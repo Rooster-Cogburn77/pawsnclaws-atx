@@ -1,19 +1,27 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 
 /**
  * Scrolls to top on route change.
- * Fixes issue where pages load slightly below the top due to
- * scroll restoration behavior with smooth scrolling enabled.
+ * Fixes issue where pages load below the top due to
+ * browser scroll restoration behavior.
  */
 export function ScrollToTop() {
   const pathname = usePathname();
 
+  // Disable browser's automatic scroll restoration
   useEffect(() => {
-    // Scroll to top on route change
-    window.scrollTo(0, 0);
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  // Use useLayoutEffect to scroll before paint
+  useLayoutEffect(() => {
+    // Force scroll to top with instant behavior
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, [pathname]);
 
   return null;
