@@ -3,7 +3,7 @@
 **This is the AUTHORITATIVE source for volatile project state.**
 
 **Last Updated**: 2026-02-02
-**Updated By**: Initial setup
+**Updated By**: Claude Opus 4.5 (Form validation session)
 
 ---
 
@@ -11,7 +11,8 @@
 
 | Area | Status | Agent | Notes |
 |------|--------|-------|-------|
-| Web | See git status | - | Check uncommitted changes |
+| Form Validation | Complete | - | All forms migrated to useFormValidation |
+| Web | Clean | - | Build passes, lint clean |
 | Database | Unknown | - | Review schema status |
 | Docs | Complete | - | Documentation system established |
 
@@ -21,7 +22,7 @@
 
 | Issue | Severity | Required Action |
 |-------|----------|-----------------|
-| Environment setup | Medium | Ensure .env.local configured |
+| Environment setup | Low | .env.local appears configured (dev server works) |
 | Supabase schema | Unknown | Verify schema applied to database |
 
 ---
@@ -30,7 +31,8 @@
 
 | Date | Change | Commit |
 |------|--------|--------|
-| 2026-02-02 | Documentation system established | - |
+| 2026-02-02 | Complete form validation migration | 97bb194 |
+| 2026-02-02 | Documentation system established | 68f6e2b |
 
 ---
 
@@ -64,6 +66,9 @@ git status && git log --oneline -5
 
 ## Notes for Next Agent
 
-- Review uncommitted changes in git status
-- Verify Supabase connection works
-- Check what features are complete vs in progress
+- All forms now use useFormValidation hook with Zod schemas
+- Charlotte forms submit to same API endpoints with `city: "charlotte"` parameter
+- API routes may need Charlotte-specific handling (currently mock/log only)
+- SubmitButton supports `className` prop for theming (Charlotte uses teal instead of amber)
+- Build and lint both pass cleanly
+- Consider testing forms manually with dev server
