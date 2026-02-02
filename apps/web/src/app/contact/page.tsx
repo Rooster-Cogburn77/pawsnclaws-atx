@@ -1,57 +1,47 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { contactSchema, type ContactFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, FormSuccess, SubmitButton } from "@/components/FormField";
 
 const contactReasons = [
-  { id: "general", label: "General Inquiry" },
-  { id: "volunteer", label: "Volunteering Question" },
-  { id: "partnership", label: "Partnership / Sponsorship" },
-  { id: "resource", label: "Suggest a Resource" },
-  { id: "report", label: "Report an Issue" },
-  { id: "media", label: "Media / Press" },
-  { id: "other", label: "Other" },
+  { value: "general", label: "General Inquiry" },
+  { value: "volunteer", label: "Volunteering Question" },
+  { value: "partnership", label: "Partnership / Sponsorship" },
+  { value: "resource", label: "Suggest a Resource" },
+  { value: "report", label: "Report an Issue" },
+  { value: "media", label: "Media / Press" },
+  { value: "other", label: "Other" },
 ];
 
+const defaultValues: ContactFormData = {
+  name: "",
+  email: "",
+  reason: "",
+  message: "",
+};
+
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    reason: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError("");
-
-    try {
+  const form = useFormValidation({
+    schema: contactSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to send message");
+        throw new Error(result.error || "Failed to send message");
       }
+    },
+  });
 
-      setSubmitted(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (submitted) {
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
         <div className="max-w-lg text-center">
@@ -114,90 +104,71 @@ export default function ContactPage() {
 
         {/* Contact Form */}
         <form
-          onSubmit={handleSubmit}
+          onSubmit={form.handleSubmit}
           className="bg-white rounded-2xl shadow-xl p-8"
         >
           <div className="space-y-4">
+            {form.submitError && (
+              <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+            )}
+
             <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                What&apos;s this about?
-              </label>
-              <select
-                value={formData.reason}
-                onChange={(e) =>
-                  setFormData({ ...formData, reason: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-              >
-                <option value="">Select a topic...</option>
-                {contactReasons.map((reason) => (
-                  <option key={reason.id} value={reason.id}>
-                    {reason.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Message *
-              </label>
-              <textarea
+              <FormField
+                label="Your Name"
+                name="name"
+                type="text"
+                value={form.values.name}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("name")}
+                touched={form.isFieldTouched("name")}
                 required
-                value={formData.message}
-                onChange={(e) =>
-                  setFormData({ ...formData, message: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
-                rows={5}
-                placeholder="How can we help?"
+              />
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={form.values.email}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("email")}
+                touched={form.isFieldTouched("email")}
+                required
               />
             </div>
 
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-                {error}
-              </div>
-            )}
+            <SelectField
+              label="What's this about?"
+              name="reason"
+              value={form.values.reason || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("reason")}
+              touched={form.isFieldTouched("reason")}
+              options={contactReasons}
+              placeholder="Select a topic..."
+            />
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white font-bold rounded-xl transition-colors"
+            <TextareaField
+              label="Message"
+              name="message"
+              value={form.values.message}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("message")}
+              touched={form.isFieldTouched("message")}
+              required
+              rows={5}
+              placeholder="How can we help?"
+            />
+
+            <SubmitButton
+              isSubmitting={form.isSubmitting}
+              isValid={form.isValid}
+              loadingText="Sending..."
             >
-              {isSubmitting ? "Sending..." : "Send Message"}
-            </button>
+              Send Message
+            </SubmitButton>
           </div>
         </form>
 
