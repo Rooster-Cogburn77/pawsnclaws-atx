@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       if (result.error) {
         console.error("Supabase error:", result.error);
       }
-    } catch (dbError) {
+    } catch {
       console.log("Lost/found report received (DB not configured):", {
         type,
         species,

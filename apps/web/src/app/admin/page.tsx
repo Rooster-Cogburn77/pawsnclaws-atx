@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuth } from "@/hooks";
 
 // Simple password protection (replace with proper auth later)
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
@@ -98,23 +99,14 @@ const dashboardItems = [
 ];
 
 export default function AdminDashboard() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed, login, logout } = useAdminAuth(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    // Check if already authenticated
-    const authToken = sessionStorage.getItem("adminAuth");
-    if (authToken === "authenticated") {
-      setIsAuthed(true);
-    }
-  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("adminAuth", "authenticated");
-      setIsAuthed(true);
+      login();
       setError("");
     } else {
       setError("Invalid password");
@@ -169,10 +161,7 @@ export default function AdminDashboard() {
             <p className="text-gray-600">Manage PawsNClaws ATX operations</p>
           </div>
           <button
-            onClick={() => {
-              sessionStorage.removeItem("adminAuth");
-              setIsAuthed(false);
-            }}
+            onClick={logout}
             className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
           >
             Logout

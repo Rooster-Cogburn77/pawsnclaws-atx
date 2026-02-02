@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { HeartIcon } from "@/components/Icons";
 import { Suspense } from "react";
 
 function ThankYouContent() {

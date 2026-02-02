@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { getCityFromPath, getCityDonateLink, getCityHomeLink, cities } from "@/config/cities";
+import { getCityFromPath, getCityDonateLink, getCityHomeLink } from "@/config/cities";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,7 +17,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
-      <nav className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <nav className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
         <div className="flex h-16 items-center justify-between">
           {/* Logo + City Selector */}
           <div className="flex items-center gap-3">
@@ -34,6 +34,9 @@ export function Header() {
               <button
                 onClick={() => setCityMenuOpen(!cityMenuOpen)}
                 className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-200 hover:border-gray-300 transition-colors"
+                aria-expanded={cityMenuOpen}
+                aria-haspopup="true"
+                aria-label="Change city location"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -107,7 +110,9 @@ export function Header() {
             type="button"
             className="md:hidden rounded-md p-2 text-gray-600 hover:bg-gray-100"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             <svg
               className="h-6 w-6"
@@ -135,7 +140,7 @@ export function Header() {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
+          <div id="mobile-menu" className="md:hidden py-4 border-t border-gray-100" role="menu">
             <div className="flex flex-col gap-4">
               {city.nav.map((item) => (
                 <Link

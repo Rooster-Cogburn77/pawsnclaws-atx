@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { CityConfig } from "@/config/cities";
 
 interface CityRepresentativesProps {
@@ -32,7 +33,7 @@ export function CityRepresentatives({ city, variant = "card" }: CityRepresentati
           <span className="text-2xl">🙋</span>
           <div className="flex-1">
             <p className="text-sm text-gray-600">
-              We're looking for a local lead in {city.shortName}.
+              We&apos;re looking for a local lead in {city.shortName}.
             </p>
             <Link href={leadGuideHref} className={`text-sm font-medium ${city.color.accent} hover:underline`}>
               Could that be you? →
@@ -50,7 +51,7 @@ export function CityRepresentatives({ city, variant = "card" }: CityRepresentati
           Help Launch PawsNClaws in {city.shortName}
         </h3>
         <p className="text-gray-600 text-sm mb-4 max-w-sm mx-auto">
-          We're looking for a passionate local to lead our {city.shortName} chapter.
+          We&apos;re looking for a passionate local to lead our {city.shortName} chapter.
           Know the community? Love animals? This could be you.
         </p>
         <Link
@@ -80,7 +81,9 @@ export function CityRepresentatives({ city, variant = "card" }: CityRepresentati
     return (
       <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
         {rep.photo ? (
-          <img src={rep.photo} alt={rep.name} className="w-12 h-12 rounded-full object-cover" />
+          <div className="relative w-12 h-12 rounded-full overflow-hidden">
+            <Image src={rep.photo} alt={rep.name} fill className="object-cover" />
+          </div>
         ) : (
           <div className={`w-12 h-12 rounded-full ${city.color.primary} flex items-center justify-center text-white font-bold text-lg`}>
             {rep.name.charAt(0)}
@@ -110,9 +113,11 @@ export function CityRepresentatives({ city, variant = "card" }: CityRepresentati
         {city.representatives.map((rep, i) => (
           <div key={i} className="flex items-start gap-4">
             {rep.photo ? (
-              <img src={rep.photo} alt={rep.name} className="w-16 h-16 rounded-full object-cover" />
+              <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                <Image src={rep.photo} alt={rep.name} fill className="object-cover" />
+              </div>
             ) : (
-              <div className={`w-16 h-16 rounded-full ${city.color.primary} flex items-center justify-center text-white font-bold text-xl`}>
+              <div className={`w-16 h-16 rounded-full ${city.color.primary} flex items-center justify-center text-white font-bold text-xl flex-shrink-0`}>
                 {rep.name.charAt(0)}
               </div>
             )}

@@ -205,7 +205,7 @@ export default function FAQPage() {
             Still Have Questions?
           </h3>
           <p className="text-sm text-amber-800 mb-4">
-            Can't find what you're looking for? We're here to help!
+            Can&apos;t find what you&apos;re looking for? We&apos;re here to help!
           </p>
           <Link
             href="/contact"

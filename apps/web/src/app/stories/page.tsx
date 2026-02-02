@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { stories, categoryLabels, categoryIcons, getRecentStories, type Story } from "@/data/stories";
 
 export const metadata = {
@@ -10,8 +11,8 @@ function StoryCard({ story }: { story: Story }) {
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
       {story.image && (
-        <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
-          <img src={story.image} alt={story.title} className="w-full h-full object-cover" />
+        <div className="relative w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+          <Image src={story.image} alt={story.title} fill className="object-cover" />
         </div>
       )}
       <div className="flex items-center gap-2 mb-2">

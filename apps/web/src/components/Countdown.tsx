@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore, useRef } from "react";
 
 interface CountdownProps {
   targetDate: Date | string;
@@ -16,44 +16,63 @@ interface TimeLeft {
   seconds: number;
 }
 
+// Hook to detect hydration
+function useHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
+
+// Calculate time left from target date
+function calculateTimeLeft(targetDate: Date | string): TimeLeft | null {
+  const target = typeof targetDate === "string" ? new Date(targetDate) : targetDate;
+  const now = new Date();
+  const difference = target.getTime() - now.getTime();
+
+  if (difference <= 0) {
+    return null;
+  }
+
+  return {
+    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / 1000 / 60) % 60),
+    seconds: Math.floor((difference / 1000) % 60),
+  };
+}
+
 export function Countdown({ targetDate, title, className = "", onComplete }: CountdownProps) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
+  const onCompleteRef = useRef(onComplete);
+
+  // Update ref in effect, not during render
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  // Initialize with lazy function - only runs on client after hydration
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(() => {
+    if (typeof window === "undefined") return null;
+    return calculateTimeLeft(targetDate);
+  });
 
   useEffect(() => {
-    setMounted(true);
+    if (!mounted) return;
 
-    const target = typeof targetDate === "string" ? new Date(targetDate) : targetDate;
-
-    const calculateTimeLeft = (): TimeLeft | null => {
-      const now = new Date();
-      const difference = target.getTime() - now.getTime();
-
-      if (difference <= 0) {
-        onComplete?.();
-        return null;
-      }
-
-      return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
-    };
-
-    setTimeLeft(calculateTimeLeft());
-
+    // Set up interval for updates
     const timer = setInterval(() => {
-      const newTimeLeft = calculateTimeLeft();
+      const newTimeLeft = calculateTimeLeft(targetDate);
       setTimeLeft(newTimeLeft);
       if (!newTimeLeft) {
+        onCompleteRef.current?.();
         clearInterval(timer);
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate, onComplete]);
+  }, [mounted, targetDate]);
 
   if (!mounted) {
     return (
@@ -106,28 +125,23 @@ export function Countdown({ targetDate, title, className = "", onComplete }: Cou
 
 // Compact inline version
 export function CountdownInline({ targetDate, className = "" }: { targetDate: Date | string; className?: string }) {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
+
+  // Initialize with lazy function
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(() => {
+    if (typeof window === "undefined") return null;
+    return calculateTimeLeft(targetDate);
+  });
 
   useEffect(() => {
-    setMounted(true);
-    const target = typeof targetDate === "string" ? new Date(targetDate) : targetDate;
+    if (!mounted) return;
 
-    const calculate = () => {
-      const diff = target.getTime() - new Date().getTime();
-      if (diff <= 0) return null;
-      return {
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((diff / 1000 / 60) % 60),
-        seconds: Math.floor((diff / 1000) % 60),
-      };
-    };
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft(targetDate));
+    }, 1000);
 
-    setTimeLeft(calculate());
-    const timer = setInterval(() => setTimeLeft(calculate()), 1000);
     return () => clearInterval(timer);
-  }, [targetDate]);
+  }, [mounted, targetDate]);
 
   if (!mounted || !timeLeft) return null;
 

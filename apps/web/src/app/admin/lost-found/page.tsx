@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuth } from "@/hooks";
 
 const sampleReports = [
   {
@@ -49,17 +50,8 @@ const sampleReports = [
 ];
 
 export default function AdminLostFoundPage() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed } = useAdminAuth();
   const [filter, setFilter] = useState<"all" | "lost" | "found" | "reunited">("all");
-
-  useEffect(() => {
-    const authToken = sessionStorage.getItem("adminAuth");
-    if (authToken === "authenticated") {
-      setIsAuthed(true);
-    } else {
-      window.location.href = "/admin";
-    }
-  }, []);
 
   if (!isAuthed) {
     return (

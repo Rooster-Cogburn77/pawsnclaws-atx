@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       if (result.error) {
         console.error("Supabase error:", result.error);
       }
-    } catch (dbError) {
+    } catch {
       console.log("Foster application received (DB not configured):", {
         name,
         email,

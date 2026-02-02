@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { UsersIcon, HeartIcon, HomeIcon } from "@/components/Icons";
+import { UsersIcon } from "@/components/Icons";
 
 const volunteerRoles = [
   {

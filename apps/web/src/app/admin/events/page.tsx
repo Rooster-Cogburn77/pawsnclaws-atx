@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuthAlt } from "@/hooks";
 
 interface EventSignup {
   id: string;
@@ -21,7 +22,7 @@ interface Event {
 }
 
 export default function AdminEventsPage() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed } = useAdminAuthAlt(false);
   const [password, setPassword] = useState("");
   const [events] = useState<Event[]>([
     // Demo data
@@ -50,18 +51,12 @@ export default function AdminEventsPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
-      setIsAuthed(true);
       sessionStorage.setItem("admin_auth", "true");
+      window.dispatchEvent(new Event("storage"));
     } else {
       alert("Invalid password");
     }
   };
-
-  useEffect(() => {
-    if (sessionStorage.getItem("admin_auth") === "true") {
-      setIsAuthed(true);
-    }
-  }, []);
 
   if (!isAuthed) {
     return (

@@ -220,7 +220,7 @@ export function getShelterInfo() {
 
 export function getSocialLinks() {
   return Object.entries(cityConfig.social)
-    .filter(([_, url]) => url)
+    .filter((entry) => entry[1])
     .map(([platform, url]) => ({ platform, url }));
 }
 

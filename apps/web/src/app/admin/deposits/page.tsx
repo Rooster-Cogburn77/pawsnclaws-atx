@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuth } from "@/hooks";
 
 const sampleApplications = [
   {
@@ -29,17 +30,8 @@ const sampleApplications = [
 ];
 
 export default function AdminDepositsPage() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed } = useAdminAuth();
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "denied">("all");
-
-  useEffect(() => {
-    const authToken = sessionStorage.getItem("adminAuth");
-    if (authToken === "authenticated") {
-      setIsAuthed(true);
-    } else {
-      window.location.href = "/admin";
-    }
-  }, []);
 
   if (!isAuthed) {
     return (

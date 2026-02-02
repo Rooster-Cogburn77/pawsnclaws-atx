@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -90,6 +90,8 @@ export default function ColonyMap({
   showFoodStations,
   onMarkerClick,
 }: ColonyMapProps) {
+  // selectedId can be used in future for highlighting markers
+  void selectedId;
   return (
     <MapContainer
       center={center}

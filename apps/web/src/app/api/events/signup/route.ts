@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       if (error) {
         console.error("Supabase error:", error);
       }
-    } catch (dbError) {
+    } catch {
       console.log("Event signup received (DB not configured):", {
         eventId,
         name,

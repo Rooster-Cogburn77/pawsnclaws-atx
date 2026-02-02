@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuth } from "@/hooks";
 
 // Sample data (will be replaced with Supabase data)
 const sampleVolunteers = [
@@ -26,17 +27,8 @@ const sampleVolunteers = [
 ];
 
 export default function AdminVolunteersPage() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed } = useAdminAuth();
   const [filter, setFilter] = useState<"all" | "pending" | "active">("all");
-
-  useEffect(() => {
-    const authToken = sessionStorage.getItem("adminAuth");
-    if (authToken === "authenticated") {
-      setIsAuthed(true);
-    } else {
-      window.location.href = "/admin";
-    }
-  }, []);
 
   if (!isAuthed) {
     return (

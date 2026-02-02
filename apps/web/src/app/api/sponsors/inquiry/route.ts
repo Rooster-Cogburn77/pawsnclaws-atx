@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       if (result.error) {
         console.error("Supabase error:", result.error);
       }
-    } catch (dbError) {
+    } catch {
       // If table doesn't exist yet, just log and return success
       // This allows the form to work before DB is set up
       console.log("Sponsor inquiry received (DB not configured):", {

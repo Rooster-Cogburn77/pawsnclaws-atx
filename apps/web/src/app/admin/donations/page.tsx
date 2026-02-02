@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuth } from "@/hooks";
 
 const sampleDonations = [
   {
@@ -97,17 +98,8 @@ const sampleSubscriptions = [
 ];
 
 export default function AdminDonationsPage() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed } = useAdminAuth();
   const [view, setView] = useState<"recent" | "recurring">("recent");
-
-  useEffect(() => {
-    const authToken = sessionStorage.getItem("adminAuth");
-    if (authToken === "authenticated") {
-      setIsAuthed(true);
-    } else {
-      window.location.href = "/admin";
-    }
-  }, []);
 
   if (!isAuthed) {
     return (

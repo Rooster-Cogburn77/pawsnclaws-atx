@@ -464,7 +464,7 @@ export default function SubmitColonyPage() {
                   onChange={(e) => setFormData({ ...formData, submitterRelation: e.target.value })}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
                 >
-                  <option value="observer">I've seen these cats</option>
+                  <option value="observer">I&apos;ve seen these cats</option>
                   <option value="caretaker">I feed/care for this colony</option>
                   <option value="neighbor">I live nearby</option>
                   <option value="property-owner">I own the property</option>

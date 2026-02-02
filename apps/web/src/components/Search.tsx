@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 
 interface SearchResult {
@@ -47,23 +47,22 @@ interface SearchProps {
 export function Search({ className = "" }: SearchProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Filter results based on query
-  useEffect(() => {
+  // Derive results from query using useMemo instead of useEffect
+  const results = useMemo(() => {
     if (query.length > 1) {
-      const filtered = sitePages.filter(
-        (page) =>
-          page.title.toLowerCase().includes(query.toLowerCase()) ||
-          page.description.toLowerCase().includes(query.toLowerCase()) ||
-          page.category.toLowerCase().includes(query.toLowerCase())
-      );
-      setResults(filtered.slice(0, 8));
-    } else {
-      setResults([]);
+      return sitePages
+        .filter(
+          (page) =>
+            page.title.toLowerCase().includes(query.toLowerCase()) ||
+            page.description.toLowerCase().includes(query.toLowerCase()) ||
+            page.category.toLowerCase().includes(query.toLowerCase())
+        )
+        .slice(0, 8);
     }
+    return [];
   }, [query]);
 
   // Handle keyboard shortcuts

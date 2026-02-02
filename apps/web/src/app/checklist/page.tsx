@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore, useCallback } from "react";
 import Link from "next/link";
 
 interface ChecklistItem {
@@ -135,24 +135,43 @@ const newPetChecklists: Record<"cat" | "dog", ChecklistCategory[]> = {
   ],
 };
 
+// Hook to sync checklist state with localStorage
+function useChecklistStorage(petType: "cat" | "dog") {
+  const key = `checklist-${petType}`;
+
+  const getSnapshot = useCallback(() => {
+    if (typeof window === "undefined") return "{}";
+    return localStorage.getItem(key) || "{}";
+  }, [key]);
+
+  const getServerSnapshot = () => "{}";
+
+  const subscribe = useCallback((callback: () => void) => {
+    window.addEventListener("storage", callback);
+    // Also listen for custom events when we update locally
+    window.addEventListener("checklist-update", callback);
+    return () => {
+      window.removeEventListener("storage", callback);
+      window.removeEventListener("checklist-update", callback);
+    };
+  }, []);
+
+  const storedValue = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const checkedItems: Record<string, boolean> = JSON.parse(storedValue);
+
+  const setCheckedItems = useCallback((updater: (prev: Record<string, boolean>) => Record<string, boolean>) => {
+    const current = JSON.parse(localStorage.getItem(key) || "{}");
+    const next = updater(current);
+    localStorage.setItem(key, JSON.stringify(next));
+    window.dispatchEvent(new Event("checklist-update"));
+  }, [key]);
+
+  return { checkedItems, setCheckedItems };
+}
+
 export default function ChecklistPage() {
   const [petType, setPetType] = useState<"cat" | "dog">("cat");
-  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-
-  // Load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem(`checklist-${petType}`);
-    if (saved) {
-      setCheckedItems(JSON.parse(saved));
-    } else {
-      setCheckedItems({});
-    }
-  }, [petType]);
-
-  // Save to localStorage
-  useEffect(() => {
-    localStorage.setItem(`checklist-${petType}`, JSON.stringify(checkedItems));
-  }, [checkedItems, petType]);
+  const { checkedItems, setCheckedItems } = useChecklistStorage(petType);
 
   const toggleItem = (id: string) => {
     setCheckedItems((prev) => ({ ...prev, [id]: !prev[id] }));

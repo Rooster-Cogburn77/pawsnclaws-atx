@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuthAlt } from "@/hooks";
 
 interface ContactMessage {
   id: string;
@@ -61,7 +62,7 @@ const reasonLabels: Record<string, string> = {
 };
 
 export default function AdminMessagesPage() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed } = useAdminAuthAlt(false);
   const [password, setPassword] = useState("");
   const [messages, setMessages] = useState<ContactMessage[]>(demoMessages);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
@@ -72,18 +73,12 @@ export default function AdminMessagesPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
-      setIsAuthed(true);
       sessionStorage.setItem("admin_auth", "true");
+      window.dispatchEvent(new Event("storage"));
     } else {
       alert("Invalid password");
     }
   };
-
-  useEffect(() => {
-    if (sessionStorage.getItem("admin_auth") === "true") {
-      setIsAuthed(true);
-    }
-  }, []);
 
   const filteredMessages = messages.filter((m) => {
     if (filter === "all") return m.status !== "archived";

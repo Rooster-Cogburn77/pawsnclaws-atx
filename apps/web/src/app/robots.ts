@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin", "/api/"],
     },
-    sitemap: "https://pawsnclaws.org/sitemap.xml",
+    sitemap: "https://pawsandclawsatx.com/sitemap.xml",
   };
 }

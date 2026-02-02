@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { getCityFromPath, getCityHomeLink } from "@/config/cities";
+import { getCityFromPath } from "@/config/cities";
 
 export function Footer() {
   const [email, setEmail] = useState("");
@@ -86,7 +86,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-gray-900 text-gray-300" role="contentinfo">
       {/* Newsletter Section */}
       <div className={bgColor}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
@@ -113,6 +113,7 @@ export function Footer() {
                   className={`px-4 py-2 rounded-lg flex-1 md:w-64 bg-white text-gray-900 focus:outline-none focus:ring-2 ${focusRing}`}
                   disabled={status === "loading"}
                   required
+                  aria-label="Email address for newsletter subscription"
                 />
                 <button
                   type="submit"
@@ -184,7 +185,7 @@ export function Footer() {
           </div>
 
           {/* Get Help */}
-          <div>
+          <nav aria-label="Help resources">
             <h3 className="font-bold text-white mb-4">Get Help</h3>
             <ul className="space-y-2">
               {footerLinks.getHelp.map((link) => (
@@ -198,10 +199,10 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Get Involved */}
-          <div>
+          <nav aria-label="Get involved options">
             <h3 className="font-bold text-white mb-4">Get Involved</h3>
             <ul className="space-y-2">
               {footerLinks.getInvolved.map((link) => (
@@ -215,10 +216,10 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           {/* Learn */}
-          <div>
+          <nav aria-label="Learn more">
             <h3 className="font-bold text-white mb-4">Learn</h3>
             <ul className="space-y-2">
               {footerLinks.learn.map((link) => (
@@ -232,7 +233,7 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
         </div>
 
         {/* Emergency */}

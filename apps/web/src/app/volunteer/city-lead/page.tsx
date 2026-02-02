@@ -51,7 +51,7 @@ export default function CityLeadGuidePage() {
             Application Received!
           </h1>
           <p className="text-lg text-gray-600 mb-8">
-            Thanks for your interest in becoming a City Lead. We'll review your
+            Thanks for your interest in becoming a City Lead. We&apos;ll review your
             application and get back to you within a few days.
           </p>
           <Link
@@ -147,7 +147,7 @@ export default function CityLeadGuidePage() {
               <span className="text-2xl mb-2 block">📚</span>
               <h3 className="font-bold text-gray-900 mb-1">Training & Support</h3>
               <p className="text-sm text-gray-600">
-                We'll walk you through everything. Templates, playbooks,
+                We&apos;ll walk you through everything. Templates, playbooks,
                 and ongoing support from the ATX team.
               </p>
             </div>
@@ -165,13 +165,13 @@ export default function CityLeadGuidePage() {
         {/* Who We're Looking For */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Who We're Looking For
+            Who We&apos;re Looking For
           </h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <span className="text-green-500 text-xl">✓</span>
               <p className="text-gray-700">
-                <strong>Passionate about animals</strong> - You don't need to be an expert,
+                <strong>Passionate about animals</strong> - You don&apos;t need to be an expert,
                 but you care deeply about helping pets and their people.
               </p>
             </div>
@@ -192,7 +192,7 @@ export default function CityLeadGuidePage() {
             <div className="flex items-start gap-3">
               <span className="text-green-500 text-xl">✓</span>
               <p className="text-gray-700">
-                <strong>Self-starter</strong> - You're excited to build something, not just
+                <strong>Self-starter</strong> - You&apos;re excited to build something, not just
                 follow instructions.
               </p>
             </div>
@@ -243,7 +243,7 @@ export default function CityLeadGuidePage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City You'd Lead *
+                  City You&apos;d Lead *
                 </label>
                 <input
                   type="text"

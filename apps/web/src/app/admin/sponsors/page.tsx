@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminAuth } from "@/hooks";
 
 const sampleInquiries = [
   {
@@ -63,17 +64,8 @@ const tierColors: Record<string, string> = {
 };
 
 export default function AdminSponsorsPage() {
-  const [isAuthed, setIsAuthed] = useState(false);
+  const { isAuthed } = useAdminAuth();
   const [view, setView] = useState<"inquiries" | "sponsors">("inquiries");
-
-  useEffect(() => {
-    const authToken = sessionStorage.getItem("adminAuth");
-    if (authToken === "authenticated") {
-      setIsAuthed(true);
-    } else {
-      window.location.href = "/admin";
-    }
-  }, []);
 
   if (!isAuthed) {
     return (

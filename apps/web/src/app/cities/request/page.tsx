@@ -53,7 +53,7 @@ export default function RequestCityPage() {
           </h1>
           <p className="text-lg text-gray-600 mb-4">
             Thanks for letting us know about <strong>{formData.city}, {formData.state}</strong>.
-            We'll keep you posted on expansion plans.
+            We&apos;ll keep you posted on expansion plans.
           </p>
           <p className="text-gray-500 mb-8">
             The more requests we get from a city, the higher priority it becomes!
@@ -87,8 +87,8 @@ export default function RequestCityPage() {
             Request Your City
           </h1>
           <p className="text-xl text-gray-600">
-            Don't see your city on PawsNClaws yet?
-            Let us know where you'd like to see us expand.
+            Don&apos;t see your city on PawsNClaws yet?
+            Let us know where you&apos;d like to see us expand.
           </p>
         </div>
 
@@ -188,7 +188,7 @@ export default function RequestCityPage() {
                   />
                   <div>
                     <p className="font-medium text-gray-900">Just interested</p>
-                    <p className="text-sm text-gray-500">I'd use the resources if available</p>
+                    <p className="text-sm text-gray-500">I&apos;d use the resources if available</p>
                   </div>
                 </label>
                 <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
@@ -202,7 +202,7 @@ export default function RequestCityPage() {
                   />
                   <div>
                     <p className="font-medium text-gray-900">I want to lead this city!</p>
-                    <p className="text-sm text-gray-500">I'm interested in being the local coordinator</p>
+                    <p className="text-sm text-gray-500">I&apos;m interested in being the local coordinator</p>
                   </div>
                 </label>
                 <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">

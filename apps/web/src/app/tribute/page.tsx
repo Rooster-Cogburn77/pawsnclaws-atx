@@ -1,18 +1,8 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
 
 export default function TributePage() {
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    petName: "",
-    petType: "cat",
-    message: "",
-    donorName: "",
-    isAnonymous: false,
-    amount: "25",
-  });
+  // TODO: Add form state when Stripe integration is complete
+  // Form will collect: petName, petType, message, donorName, isAnonymous, amount
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12 px-4">

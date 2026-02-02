@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { sponsorTiers, formatAmount } from "@/lib/stripe";
 
 export default function SponsorPage() {
@@ -53,12 +54,12 @@ export default function SponsorPage() {
             We&apos;ve received your sponsorship inquiry and will be in touch within
             2 business days to discuss partnership opportunities.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block px-6 py-3 bg-amber-500 text-white font-medium rounded-xl hover:bg-amber-600 transition-colors"
           >
             Return Home
-          </a>
+          </Link>
         </div>
       </div>
     );

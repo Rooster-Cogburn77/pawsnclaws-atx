@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         message,
         status: "new",
       });
-    } catch (dbError) {
+    } catch {
       // Log for now if DB not configured
       console.log("Contact form submission received:", {
         name,

@@ -128,10 +128,10 @@ export default function CitiesPage() {
         <div className="max-w-6xl mx-auto px-4 text-center">
           <span className="text-5xl mb-4 block">🌎</span>
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Don't See Your City?
+            Don&apos;t See Your City?
           </h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Let us know where you'd like to see PawsNClaws next.
+            Let us know where you&apos;d like to see PawsNClaws next.
             The more requests we get, the higher priority a city becomes.
           </p>
           <Link
@@ -150,8 +150,8 @@ export default function CitiesPage() {
             Ready to Lead?
           </h2>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Each city needs a local champion. If you're passionate about helping
-            pets and people in your community, we'd love to talk.
+            Each city needs a local champion. If you&apos;re passionate about helping
+            pets and people in your community, we&apos;d love to talk.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

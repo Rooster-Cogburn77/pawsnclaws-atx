@@ -1,21 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark" | "system";
 
-export function ThemeToggle({ className = "" }: { className?: string }) {
-  const [theme, setTheme] = useState<Theme>("system");
-  const [mounted, setMounted] = useState(false);
+// Hook to detect hydration without causing setState-in-effect
+function useHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 
-  // Only run on client
-  useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem("theme") as Theme | null;
-    if (saved) {
-      setTheme(saved);
-    }
-  }, []);
+// Hook to sync with localStorage theme
+function useStoredTheme(): Theme {
+  return useSyncExternalStore(
+    (callback) => {
+      window.addEventListener("storage", callback);
+      return () => window.removeEventListener("storage", callback);
+    },
+    () => (localStorage.getItem("theme") as Theme) || "system",
+    () => "system"
+  );
+}
+
+export function ThemeToggle({ className = "" }: { className?: string }) {
+  const mounted = useHydrated();
+  const storedTheme = useStoredTheme();
+  const [theme, setTheme] = useState<Theme>(storedTheme);
 
   // Apply theme changes
   useEffect(() => {
@@ -98,25 +111,34 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   );
 }
 
+// Hook to sync with dark mode class on document
+function useIsDark() {
+  return useSyncExternalStore(
+    (callback) => {
+      // Watch for class changes on documentElement
+      const observer = new MutationObserver(callback);
+      if (typeof document !== "undefined") {
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+      }
+      return () => observer.disconnect();
+    },
+    () => typeof document !== "undefined" && document.documentElement.classList.contains("dark"),
+    () => false
+  );
+}
+
 // Compact version for nav
 export function ThemeToggleCompact({ className = "" }: { className?: string }) {
-  const [isDark, setIsDark] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
+  const mounted = useHydrated();
+  const isDark = useIsDark();
 
   const toggle = () => {
-    const newValue = !isDark;
-    setIsDark(newValue);
-    if (newValue) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
+    if (isDark) {
       document.documentElement.classList.remove("dark");
       localStorage.setItem("theme", "light");
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     }
   };
 

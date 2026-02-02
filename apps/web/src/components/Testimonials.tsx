@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 
 // Note: This component is ready to display real testimonials
 // when approved by the people quoted. Until then, it shows

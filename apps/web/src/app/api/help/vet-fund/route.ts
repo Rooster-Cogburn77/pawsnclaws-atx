@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       if (result.error) {
         console.error("Supabase error:", result.error);
       }
-    } catch (dbError) {
+    } catch {
       // Log anyway if DB not set up
       console.log("Vet fund request received (DB not configured):", {
         name,

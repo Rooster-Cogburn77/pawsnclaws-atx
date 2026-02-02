@@ -169,6 +169,22 @@ const templates = {
       <a href="https://pawsnclaws.org/unsubscribe">Unsubscribe</a>
     </p>
   `),
+
+  // Colony submission notification
+  colonySubmission: (data: { colonyName: string; location: string; estimatedCats: string; submitterName: string; submitterEmail: string; urgentNeeds?: string }) => templates.base(`
+    <h2>New Colony Submission</h2>
+    <p><strong>Colony Name:</strong> ${data.colonyName}</p>
+    <p><strong>Location:</strong> ${data.location}</p>
+    <p><strong>Estimated Cats:</strong> ${data.estimatedCats}</p>
+    <p><strong>Submitted by:</strong> ${data.submitterName} (${data.submitterEmail})</p>
+    ${data.urgentNeeds ? `
+    <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin: 15px 0;">
+      <p style="color: #dc2626; font-weight: bold; margin: 0 0 10px 0;">⚠️ Urgent Needs:</p>
+      <p style="margin: 0;">${data.urgentNeeds}</p>
+    </div>
+    ` : ''}
+    <a href="https://pawsnclaws.org/admin/colonies" class="button">Review in Admin</a>
+  `),
 };
 
 /**
@@ -276,5 +292,13 @@ export const emails = {
       to: email,
       subject: "Welcome to the PawsNClaws Newsletter!",
       html: templates.newsletterWelcome(email),
+    }),
+
+  sendColonySubmissionNotification: (adminEmail: string, data: { colonyName: string; location: string; estimatedCats: string; submitterName: string; submitterEmail: string; urgentNeeds?: string }) =>
+    sendEmail({
+      to: adminEmail,
+      subject: `[Colony] New submission - ${data.colonyName} (${data.estimatedCats} cats)`,
+      html: templates.colonySubmission(data),
+      replyTo: data.submitterEmail,
     }),
 };

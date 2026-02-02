@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { formatAmount } from "@/lib/stripe";
-import { AlertIcon, HeartIcon } from "@/components/Icons";
+import { AlertIcon } from "@/components/Icons";
 
 // Demo campaigns - will come from Supabase
 const demoCampaigns = [
@@ -46,7 +46,7 @@ const demoCampaigns = [
 ];
 
 export default function CampaignsPage() {
-  const [campaigns, setCampaigns] = useState(demoCampaigns);
+  const [campaigns] = useState(demoCampaigns);
   const [filter, setFilter] = useState<"all" | "urgent" | "funded">("all");
 
   const filteredCampaigns = campaigns.filter((c) => {
