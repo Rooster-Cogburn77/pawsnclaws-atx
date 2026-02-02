@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useFormValidation } from "@/hooks";
 import { tributeSchema, type TributeFormData } from "@/lib/validations";
-import { FormField, TextareaField, SelectField, CheckboxField, RadioGroup, FormError, FormSuccess, SubmitButton } from "@/components/FormField";
+import { FormField, TextareaField, CheckboxField, RadioGroup, FormError, FormSuccess, SubmitButton } from "@/components/FormField";
 import { formatAmount, calculateFee } from "@/lib/stripe";
 
 const defaultValues: TributeFormData = {

@@ -124,7 +124,8 @@ export function useFormValidation<T extends Record<string, unknown>>({
           if (error) {
             return { ...prev, [field]: error };
           }
-          const { [field as string]: _, ...rest } = prev;
+          const { [field as string]: _removed, ...rest } = prev;
+          void _removed; // Intentionally unused - extracting to exclude from rest
           return rest;
         });
       }
@@ -148,7 +149,8 @@ export function useFormValidation<T extends Record<string, unknown>>({
         if (error) {
           return { ...prev, [field]: error };
         }
-        const { [field as string]: _, ...rest } = prev;
+        const { [field as string]: _removed, ...rest } = prev;
+        void _removed; // Intentionally unused - extracting to exclude from rest
         return rest;
       });
     },

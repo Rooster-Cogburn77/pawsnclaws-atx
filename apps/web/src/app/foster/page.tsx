@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { fosterSchema, type FosterFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, SubmitButton } from "@/components/FormField";
 
 const fosterBenefits = [
   {
@@ -64,53 +66,69 @@ const fosterTypes = [
   },
 ];
 
+const otherPetsOptions = [
+  { value: "none", label: "No pets" },
+  { value: "dogs", label: "Dogs only" },
+  { value: "cats", label: "Cats only" },
+  { value: "both", label: "Dogs and cats" },
+  { value: "other", label: "Other pets" },
+];
+
+const hasKidsOptions = [
+  { value: "none", label: "No children" },
+  { value: "under5", label: "Under 5 years" },
+  { value: "5to12", label: "5-12 years" },
+  { value: "teens", label: "Teenagers" },
+];
+
+const housingOptions = [
+  { value: "house-owned", label: "House (owned)" },
+  { value: "house-rented", label: "House (rented)" },
+  { value: "apartment", label: "Apartment" },
+  { value: "condo", label: "Condo/Townhouse" },
+];
+
+const defaultValues: FosterFormData = {
+  name: "",
+  email: "",
+  phone: "",
+  fosterTypes: [],
+  hasOtherPets: "",
+  hasKids: "",
+  housingType: "",
+  experience: "",
+  whyFoster: "",
+};
+
 export default function FosterPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    fosterType: [] as string[],
-    hasOtherPets: "",
-    hasKids: "",
-    housingType: "",
-    experience: "",
-    whyFoster: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const toggleFosterType = (typeId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      fosterType: prev.fosterType.includes(typeId)
-        ? prev.fosterType.filter((t) => t !== typeId)
-        : [...prev.fosterType, typeId],
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
+  const form = useFormValidation({
+    schema: fosterSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
       const response = await fetch("/api/foster", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
-      if (response.ok) {
-        setSubmitted(true);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit application");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+  });
+
+  const toggleFosterType = (typeId: string) => {
+    const currentTypes = form.values.fosterTypes || [];
+    const newTypes = currentTypes.includes(typeId)
+      ? currentTypes.filter((t) => t !== typeId)
+      : [...currentTypes, typeId];
+    form.setValue("fosterTypes", newTypes);
+    form.setTouched("fosterTypes");
   };
 
-  if (submitted) {
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
         <div className="max-w-lg text-center">
@@ -167,7 +185,7 @@ export default function FosterPage() {
           ))}
         </div>
 
-        {/* Foster Types */}
+        {/* Foster Types Info */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
             Types of Fostering
@@ -193,72 +211,67 @@ export default function FosterPage() {
 
         {/* Application Form */}
         <form
-          onSubmit={handleSubmit}
+          onSubmit={form.handleSubmit}
           className="bg-white rounded-2xl shadow-xl p-8"
         >
           <h2 className="text-xl font-bold text-gray-900 mb-6">
             Foster Application
           </h2>
 
+          {form.submitError && (
+            <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+          )}
+
           <h3 className="font-bold text-gray-900 mb-4">Contact Information</h3>
           <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-              />
-            </div>
+            <FormField
+              label="Full Name"
+              name="name"
+              type="text"
+              value={form.values.name}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("name")}
+              touched={form.isFieldTouched("name")}
+              required
+            />
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone *
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={form.values.email}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("email")}
+                touched={form.isFieldTouched("email")}
+                required
+              />
+              <FormField
+                label="Phone"
+                name="phone"
+                type="tel"
+                value={form.values.phone}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("phone")}
+                touched={form.isFieldTouched("phone")}
+                required
+              />
             </div>
           </div>
 
           <h3 className="font-bold text-gray-900 mb-4">
             What type of fostering interests you?
           </h3>
-          <div className="grid sm:grid-cols-2 gap-2 mb-6">
+          <div className="grid sm:grid-cols-2 gap-2 mb-2">
             {fosterTypes.map((type) => (
               <button
                 key={type.id}
                 type="button"
                 onClick={() => toggleFosterType(type.id)}
                 className={`p-3 text-left text-sm rounded-lg border-2 transition-all ${
-                  formData.fosterType.includes(type.id)
+                  form.values.fosterTypes?.includes(type.id)
                     ? "border-amber-500 bg-amber-50"
                     : "border-gray-200 hover:border-amber-300"
                 }`}
@@ -270,106 +283,84 @@ export default function FosterPage() {
               </button>
             ))}
           </div>
+          {form.isFieldTouched("fosterTypes") && form.getFieldError("fosterTypes") && (
+            <p className="text-red-500 text-sm mb-6">
+              {form.getFieldError("fosterTypes")}
+            </p>
+          )}
+          <div className="mb-6" />
 
           <h3 className="font-bold text-gray-900 mb-4">About Your Home</h3>
           <div className="space-y-4 mb-6">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Other pets in home?
-                </label>
-                <select
-                  value={formData.hasOtherPets}
-                  onChange={(e) =>
-                    setFormData({ ...formData, hasOtherPets: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                >
-                  <option value="">Select...</option>
-                  <option value="none">No pets</option>
-                  <option value="dogs">Dogs only</option>
-                  <option value="cats">Cats only</option>
-                  <option value="both">Dogs and cats</option>
-                  <option value="other">Other pets</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Children in home?
-                </label>
-                <select
-                  value={formData.hasKids}
-                  onChange={(e) =>
-                    setFormData({ ...formData, hasKids: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                >
-                  <option value="">Select...</option>
-                  <option value="none">No children</option>
-                  <option value="under5">Under 5 years</option>
-                  <option value="5to12">5-12 years</option>
-                  <option value="teens">Teenagers</option>
-                </select>
-              </div>
+              <SelectField
+                label="Other pets in home?"
+                name="hasOtherPets"
+                value={form.values.hasOtherPets || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("hasOtherPets")}
+                touched={form.isFieldTouched("hasOtherPets")}
+                options={otherPetsOptions}
+                placeholder="Select..."
+              />
+              <SelectField
+                label="Children in home?"
+                name="hasKids"
+                value={form.values.hasKids || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("hasKids")}
+                touched={form.isFieldTouched("hasKids")}
+                options={hasKidsOptions}
+                placeholder="Select..."
+              />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Housing type
-              </label>
-              <select
-                value={formData.housingType}
-                onChange={(e) =>
-                  setFormData({ ...formData, housingType: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-              >
-                <option value="">Select...</option>
-                <option value="house-owned">House (owned)</option>
-                <option value="house-rented">House (rented)</option>
-                <option value="apartment">Apartment</option>
-                <option value="condo">Condo/Townhouse</option>
-              </select>
-            </div>
+            <SelectField
+              label="Housing type"
+              name="housingType"
+              value={form.values.housingType || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("housingType")}
+              touched={form.isFieldTouched("housingType")}
+              options={housingOptions}
+              placeholder="Select..."
+            />
           </div>
 
           <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Pet experience
-              </label>
-              <textarea
-                value={formData.experience}
-                onChange={(e) =>
-                  setFormData({ ...formData, experience: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
-                rows={3}
-                placeholder="Tell us about your experience with pets..."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Why do you want to foster?
-              </label>
-              <textarea
-                value={formData.whyFoster}
-                onChange={(e) =>
-                  setFormData({ ...formData, whyFoster: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
-                rows={3}
-                placeholder="What draws you to fostering?"
-              />
-            </div>
+            <TextareaField
+              label="Pet experience"
+              name="experience"
+              value={form.values.experience || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("experience")}
+              touched={form.isFieldTouched("experience")}
+              rows={3}
+              placeholder="Tell us about your experience with pets..."
+            />
+            <TextareaField
+              label="Why do you want to foster?"
+              name="whyFoster"
+              value={form.values.whyFoster || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("whyFoster")}
+              touched={form.isFieldTouched("whyFoster")}
+              rows={3}
+              placeholder="What draws you to fostering?"
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white font-bold rounded-xl transition-colors"
+          <SubmitButton
+            isSubmitting={form.isSubmitting}
+            isValid={form.isValid}
+            loadingText="Submitting..."
           >
-            {isSubmitting ? "Submitting..." : "Submit Application"}
-          </button>
+            Submit Application
+          </SubmitButton>
         </form>
 
         {/* FAQ */}

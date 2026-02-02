@@ -6,12 +6,12 @@ import { z } from "zod";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
-// Volunteer signup schema (different from volunteer application schema)
+// Volunteer signup schema
 const volunteerSignupSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().email("Invalid email address"),
   phone: z.string().optional(),
-  interests: z.array(z.string()).optional(),
+  roles: z.array(z.string()).min(1, "Please select at least one role"),
   availability: z.string().optional(),
   experience: z.string().optional(),
   hasVehicle: z.boolean().optional(),
@@ -19,16 +19,14 @@ const volunteerSignupSchema = z.object({
   message: z.string().max(5000).optional(),
 });
 
-// Map interest IDs to readable names
-const interestLabels: Record<string, string> = {
-  "colony-care": "Colony Care",
-  "tnr-transport": "TNR Transport",
-  "foster": "Fostering",
-  "events": "Event Support",
-  "admin": "Administrative",
-  "outreach": "Community Outreach",
-  "photography": "Pet Photography",
-  "social-media": "Social Media",
+// Map role IDs to readable names
+const roleLabelsMap: Record<string, string> = {
+  "colony-feeder": "Colony Feeder",
+  "tnr-helper": "TNR Volunteer",
+  "foster": "Foster Parent",
+  "transport": "Transport Driver",
+  "events": "Event Volunteer",
+  "admin": "Admin Support",
 };
 
 export async function POST(request: NextRequest) {
@@ -52,7 +50,7 @@ export async function POST(request: NextRequest) {
       name,
       email,
       phone,
-      interests,
+      roles,
       availability,
       experience,
       hasVehicle,
@@ -63,11 +61,11 @@ export async function POST(request: NextRequest) {
     const supabase = createServerSupabase();
 
     try {
-      const result = await supabase.from("volunteers").insert({
+      const dbResult = await supabase.from("volunteers").insert({
         name,
         email,
         phone: phone || null,
-        skills: interests || [],
+        skills: roles || [],
         availability: availability || null,
         is_foster_approved: false,
         background_check: false,
@@ -80,20 +78,20 @@ export async function POST(request: NextRequest) {
         }),
       });
 
-      if (result.error) {
-        console.error("Supabase error:", result.error);
+      if (dbResult.error) {
+        console.error("Supabase error:", dbResult.error);
       }
     } catch {
       console.log("Volunteer signup received (DB not configured):", {
         name,
         email,
-        interests,
+        roles,
       });
     }
 
-    // Convert interest IDs to readable labels
-    const roleLabels = (interests || []).map(
-      (id: string) => interestLabels[id] || id
+    // Convert role IDs to readable labels
+    const roleLabels = (roles || []).map(
+      (id: string) => roleLabelsMap[id] || id
     );
 
     // Send welcome email to volunteer

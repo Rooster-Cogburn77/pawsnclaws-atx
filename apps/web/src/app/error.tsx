@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -47,12 +48,12 @@ export default function Error({ error, reset }: ErrorProps) {
           </button>
 
           <div className="pt-4">
-            <a
+            <Link
               href="/"
               className="text-amber-600 hover:text-amber-700 font-medium"
             >
               Return to Home
-            </a>
+            </Link>
           </div>
 
           <p className="text-sm text-gray-500 pt-4">

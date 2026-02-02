@@ -1,48 +1,44 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { sponsorTiers, formatAmount } from "@/lib/stripe";
+import { useFormValidation } from "@/hooks";
+import { sponsorInquirySchema, type SponsorInquiryFormData } from "@/lib/validations";
+import { FormField, TextareaField, FormError, SubmitButton } from "@/components/FormField";
+
+const defaultValues: SponsorInquiryFormData = {
+  companyName: "",
+  contactName: "",
+  contactEmail: "",
+  contactPhone: "",
+  tier: "",
+  message: "",
+};
 
 export default function SponsorPage() {
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    companyName: "",
-    contactName: "",
-    contactEmail: "",
-    contactPhone: "",
-    website: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
+  const form = useFormValidation({
+    schema: sponsorInquirySchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
       const response = await fetch("/api/sponsors/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          tier: selectedTier,
-        }),
+        body: JSON.stringify(data),
       });
 
-      if (response.ok) {
-        setSubmitted(true);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to send inquiry");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+  });
+
+  const setSelectedTier = (tier: string) => {
+    form.setValue("tier", tier);
   };
 
-  if (submitted) {
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
         <div className="max-w-lg text-center">
@@ -130,7 +126,7 @@ export default function SponsorPage() {
                 type="button"
                 onClick={() => setSelectedTier(key)}
                 className={`p-6 rounded-xl border-2 text-left transition-all ${
-                  selectedTier === key
+                  form.values.tier === key
                     ? "border-amber-500 bg-amber-50"
                     : "border-gray-200 bg-white hover:border-amber-300"
                 }`}
@@ -222,116 +218,90 @@ export default function SponsorPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Start the Conversation
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Company Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.companyName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, companyName: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Website
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) =>
-                      setFormData({ ...formData, website: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                    placeholder="https://"
-                  />
-                </div>
-              </div>
+            <form onSubmit={form.handleSubmit} className="space-y-4">
+              {form.submitError && (
+                <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+              )}
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contact Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.contactName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, contactName: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.contactPhone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, contactPhone: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
+                <FormField
+                  label="Company Name"
+                  name="companyName"
+                  type="text"
+                  value={form.values.companyName}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("companyName")}
+                  touched={form.isFieldTouched("companyName")}
                   required
-                  value={formData.contactEmail}
-                  onChange={(e) =>
-                    setFormData({ ...formData, contactEmail: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
+                />
+                <FormField
+                  label="Phone"
+                  name="contactPhone"
+                  type="tel"
+                  value={form.values.contactPhone || ""}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("contactPhone")}
+                  touched={form.isFieldTouched("contactPhone")}
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  What interests you?
-                </label>
-                <textarea
-                  value={formData.message}
-                  onChange={(e) =>
-                    setFormData({ ...formData, message: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
-                  rows={4}
-                  placeholder="Tell us about your company and what type of partnership interests you..."
+              <div className="grid md:grid-cols-2 gap-4">
+                <FormField
+                  label="Contact Name"
+                  name="contactName"
+                  type="text"
+                  value={form.values.contactName}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("contactName")}
+                  touched={form.isFieldTouched("contactName")}
+                  required
+                />
+                <FormField
+                  label="Email"
+                  name="contactEmail"
+                  type="email"
+                  value={form.values.contactEmail}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("contactEmail")}
+                  touched={form.isFieldTouched("contactEmail")}
+                  required
                 />
               </div>
 
-              {selectedTier && (
+              <TextareaField
+                label="What interests you?"
+                name="message"
+                value={form.values.message || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("message")}
+                touched={form.isFieldTouched("message")}
+                rows={4}
+                placeholder="Tell us about your company and what type of partnership interests you..."
+              />
+
+              {form.values.tier && (
                 <div className="p-4 bg-amber-50 rounded-xl">
                   <span className="text-sm text-amber-700">
                     Selected tier:{" "}
-                    <strong className="capitalize">{selectedTier}</strong> (
-                    {formatAmount(sponsorTiers[selectedTier as keyof typeof sponsorTiers].minAmount)}
+                    <strong className="capitalize">{form.values.tier}</strong> (
+                    {formatAmount(sponsorTiers[form.values.tier as keyof typeof sponsorTiers].minAmount)}
                     /month)
                   </span>
                 </div>
               )}
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white font-bold rounded-xl transition-colors"
+              <SubmitButton
+                isSubmitting={form.isSubmitting}
+                isValid={form.isValid}
+                loadingText="Sending..."
               >
-                {isSubmitting ? "Sending..." : "Send Inquiry"}
-              </button>
+                Send Inquiry
+              </SubmitButton>
             </form>
           </div>
         </div>

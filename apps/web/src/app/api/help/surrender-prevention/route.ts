@@ -40,23 +40,23 @@ export async function POST(request: NextRequest) {
       email,
       phone,
       petInfo,
-      reason,
-      situation,
+      reasons,
+      otherReason,
       timeline,
-      assistanceNeeded,
+      whatWouldHelp,
+      triedOptions,
     } = result.data;
 
-    // Map reason to readable text
-    const reasonText = reasonLabels[reason] || reason;
-    const whatWouldHelp = assistanceNeeded?.join(", ");
-    const triedOptions = body.triedOptions;
+    // Map reasons to readable text
+    const reasonTexts = (reasons || []).map(r => reasonLabels[r] || r);
+    const reasonText = reasonTexts.join(", ") + (otherReason ? ` (${otherReason})` : "");
 
     const supabase = createServerSupabase();
 
     const isUrgent = timeline === "immediate";
 
     try {
-      const result = await supabase.from("surrender_prevention").insert({
+      const dbResult = await supabase.from("surrender_prevention").insert({
         contact_name: name,
         contact_email: email || null,
         contact_phone: phone,
@@ -67,25 +67,25 @@ export async function POST(request: NextRequest) {
         notes: JSON.stringify({
           timeline,
           triedOptions,
-          situation,
-          rawReason: reason,
+          rawReasons: reasons,
+          otherReason,
         }),
       });
 
-      if (result.error) {
-        console.error("Supabase error:", result.error);
+      if (dbResult.error) {
+        console.error("Supabase error:", dbResult.error);
       }
     } catch {
       console.log("Surrender prevention case received (DB not configured):", {
         name,
         phone,
-        reason,
+        reasons,
         timeline,
       });
     }
 
-    // Get readable reason label
-    const readableReason = reasonLabels[reason] || reason;
+    // Readable reasons
+    const readableReason = reasonText;
 
     // Send alert email to volunteer coordinator (with sanitized content)
     const sanitizedPhone = sanitizePhone(phone || "");
@@ -103,12 +103,8 @@ export async function POST(request: NextRequest) {
         <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
           ${sanitizeForHtml(petInfo, { preserveNewlines: true })}
         </div>
-        <p><strong>Reason:</strong> ${escapeHtml(readableReason)}</p>
-        <p><strong>Situation:</strong></p>
-        <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-          ${sanitizeForHtml(situation, { preserveNewlines: true })}
-        </div>
-        <p><strong>Timeline:</strong> ${timeline === "immediate" ? "Within 48 hours" : timeline === "week" ? "Within a week" : timeline === "month" ? "Within a month" : "Flexible"}</p>
+        <p><strong>Reasons:</strong> ${escapeHtml(readableReason)}</p>
+        <p><strong>Timeline:</strong> ${timeline === "urgent" ? "Within 48 hours" : timeline === "soon" ? "Within 2 weeks" : timeline === "month" ? "Within a month" : "Flexible"}</p>
         ${whatWouldHelp ? `<p><strong>What Would Help:</strong> ${escapeHtml(whatWouldHelp)}</p>` : ""}
         ${triedOptions ? `<p><strong>Already Tried:</strong> ${sanitizeForHtml(triedOptions, { preserveNewlines: true })}</p>` : ""}
         <a href="tel:${sanitizedPhone.replace(/\D/g, '')}" class="button">Call ${escapeHtml(name)}</a>

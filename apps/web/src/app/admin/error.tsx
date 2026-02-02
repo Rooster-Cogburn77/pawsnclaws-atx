@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -52,12 +53,12 @@ export default function AdminError({ error, reset }: ErrorProps) {
             Back to Admin Dashboard
           </a>
 
-          <a
+          <Link
             href="/"
             className="inline-block text-gray-500 hover:text-gray-700 text-sm"
           >
             Return to Main Site
-          </a>
+          </Link>
         </div>
       </div>
     </div>

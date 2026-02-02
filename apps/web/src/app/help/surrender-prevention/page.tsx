@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { surrenderPreventionSchema, type SurrenderPreventionFormData } from "@/lib/validations";
+import { FormField, TextareaField, FormError, SubmitButton } from "@/components/FormField";
 
 const surrenderReasons = [
   { id: "housing", label: "Housing issues (moving, can't find pet-friendly place)" },
@@ -14,53 +16,59 @@ const surrenderReasons = [
   { id: "other", label: "Other reason" },
 ];
 
+const timelineOptions = [
+  { id: "urgent", label: "Urgent (days)" },
+  { id: "soon", label: "Within 2 weeks" },
+  { id: "month", label: "Within a month" },
+  { id: "flexible", label: "Flexible / exploring options" },
+];
+
+const defaultValues: SurrenderPreventionFormData = {
+  name: "",
+  email: "",
+  phone: "",
+  petInfo: "",
+  reasons: [],
+  otherReason: "",
+  timeline: "flexible",
+  whatWouldHelp: "",
+  triedOptions: "",
+};
+
 export default function SurrenderPreventionPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    petInfo: "",
-    reasons: [] as string[],
-    otherReason: "",
-    timeline: "flexible",
-    whatWouldHelp: "",
-    triedOptions: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const toggleReason = (reasonId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      reasons: prev.reasons.includes(reasonId)
-        ? prev.reasons.filter((r) => r !== reasonId)
-        : [...prev.reasons, reasonId],
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
+  const form = useFormValidation({
+    schema: surrenderPreventionSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
       const response = await fetch("/api/help/surrender-prevention", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
-      if (response.ok) {
-        setSubmitted(true);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit case");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+  });
+
+  const toggleReason = (reasonId: string) => {
+    const currentReasons = form.values.reasons || [];
+    const newReasons = currentReasons.includes(reasonId)
+      ? currentReasons.filter((r) => r !== reasonId)
+      : [...currentReasons, reasonId];
+    form.setValue("reasons", newReasons);
+    form.setTouched("reasons");
   };
 
-  if (submitted) {
+  const setTimeline = (timeline: string) => {
+    form.setValue("timeline", timeline);
+    form.setTouched("timeline");
+  };
+
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
         <div className="max-w-lg text-center">
@@ -118,68 +126,61 @@ export default function SurrenderPreventionPage() {
 
         {/* Form */}
         <form
-          onSubmit={handleSubmit}
+          onSubmit={form.handleSubmit}
           className="bg-white rounded-2xl shadow-xl p-8"
         >
+          {form.submitError && (
+            <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+          )}
+
           <h3 className="font-bold text-gray-900 mb-4">Contact Information</h3>
           <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Your Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-              />
-            </div>
+            <FormField
+              label="Your Name"
+              name="name"
+              type="text"
+              value={form.values.name}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("name")}
+              touched={form.isFieldTouched("name")}
+              required
+            />
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone *
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={form.values.email}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("email")}
+                touched={form.isFieldTouched("email")}
+              />
+              <FormField
+                label="Phone"
+                name="phone"
+                type="tel"
+                value={form.values.phone || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("phone")}
+                touched={form.isFieldTouched("phone")}
+              />
             </div>
           </div>
 
           <h3 className="font-bold text-gray-900 mb-4">About Your Pet</h3>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tell us about your pet *
-            </label>
-            <textarea
+            <TextareaField
+              label="Tell us about your pet"
+              name="petInfo"
+              value={form.values.petInfo}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("petInfo")}
+              touched={form.isFieldTouched("petInfo")}
               required
-              value={formData.petInfo}
-              onChange={(e) =>
-                setFormData({ ...formData, petInfo: e.target.value })
-              }
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
               rows={3}
               placeholder="Species, breed, age, name, personality, any health or behavioral notes..."
             />
@@ -188,14 +189,14 @@ export default function SurrenderPreventionPage() {
           <h3 className="font-bold text-gray-900 mb-4">
             What&apos;s making you consider this?
           </h3>
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-2 gap-2 mb-2">
             {surrenderReasons.map((reason) => (
               <button
                 key={reason.id}
                 type="button"
                 onClick={() => toggleReason(reason.id)}
                 className={`p-3 text-left text-sm rounded-lg border-2 transition-all ${
-                  formData.reasons.includes(reason.id)
+                  form.values.reasons?.includes(reason.id)
                     ? "border-amber-500 bg-amber-50"
                     : "border-gray-200 hover:border-amber-300"
                 }`}
@@ -204,37 +205,37 @@ export default function SurrenderPreventionPage() {
               </button>
             ))}
           </div>
+          {form.isFieldTouched("reasons") && form.getFieldError("reasons") && (
+            <p className="text-red-500 text-sm mb-4">
+              {form.getFieldError("reasons")}
+            </p>
+          )}
 
-          {formData.reasons.includes("other") && (
+          {form.values.reasons?.includes("other") && (
             <div className="mb-6">
-              <input
+              <FormField
+                label="Please describe"
+                name="otherReason"
                 type="text"
-                value={formData.otherReason}
-                onChange={(e) =>
-                  setFormData({ ...formData, otherReason: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                placeholder="Please describe..."
+                value={form.values.otherReason || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("otherReason")}
+                touched={form.isFieldTouched("otherReason")}
+                placeholder="Please describe your reason..."
               />
             </div>
           )}
 
-          <h3 className="font-bold text-gray-900 mb-4">Timeline</h3>
+          <h3 className="font-bold text-gray-900 mb-4 mt-6">Timeline</h3>
           <div className="flex flex-wrap gap-2 mb-6">
-            {[
-              { id: "urgent", label: "Urgent (days)" },
-              { id: "soon", label: "Within 2 weeks" },
-              { id: "month", label: "Within a month" },
-              { id: "flexible", label: "Flexible / exploring options" },
-            ].map((option) => (
+            {timelineOptions.map((option) => (
               <button
                 key={option.id}
                 type="button"
-                onClick={() =>
-                  setFormData({ ...formData, timeline: option.id })
-                }
+                onClick={() => setTimeline(option.id)}
                 className={`px-4 py-2 rounded-lg border-2 text-sm transition-all ${
-                  formData.timeline === option.id
+                  form.values.timeline === option.id
                     ? "border-amber-500 bg-amber-50"
                     : "border-gray-200 hover:border-amber-300"
                 }`}
@@ -245,44 +246,38 @@ export default function SurrenderPreventionPage() {
           </div>
 
           <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                What would help you keep your pet?
-              </label>
-              <textarea
-                value={formData.whatWouldHelp}
-                onChange={(e) =>
-                  setFormData({ ...formData, whatWouldHelp: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
-                rows={2}
-                placeholder="Financial help, training, temporary foster, housing assistance..."
-              />
-            </div>
+            <TextareaField
+              label="What would help you keep your pet?"
+              name="whatWouldHelp"
+              value={form.values.whatWouldHelp || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("whatWouldHelp")}
+              touched={form.isFieldTouched("whatWouldHelp")}
+              rows={2}
+              placeholder="Financial help, training, temporary foster, housing assistance..."
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                What have you already tried?
-              </label>
-              <textarea
-                value={formData.triedOptions}
-                onChange={(e) =>
-                  setFormData({ ...formData, triedOptions: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
-                rows={2}
-                placeholder="Rehoming through friends, pet-friendly housing search, training, etc."
-              />
-            </div>
+            <TextareaField
+              label="What have you already tried?"
+              name="triedOptions"
+              value={form.values.triedOptions || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("triedOptions")}
+              touched={form.isFieldTouched("triedOptions")}
+              rows={2}
+              placeholder="Rehoming through friends, pet-friendly housing search, training, etc."
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white font-bold rounded-xl transition-colors"
+          <SubmitButton
+            isSubmitting={form.isSubmitting}
+            isValid={form.isValid}
+            loadingText="Submitting..."
           >
-            {isSubmitting ? "Submitting..." : "Get Help"}
-          </button>
+            Get Help
+          </SubmitButton>
         </form>
 
         {/* Immediate Resources */}

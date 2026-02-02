@@ -11,9 +11,9 @@ const fosterApplicationSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().email("Invalid email address"),
   phone: z.string().min(1, "Phone is required"),
-  fosterType: z.array(z.string()).optional(),
-  hasOtherPets: z.boolean().optional(),
-  hasKids: z.boolean().optional(),
+  fosterTypes: z.array(z.string()).min(1, "Please select at least one foster type"),
+  hasOtherPets: z.string().optional(),
+  hasKids: z.string().optional(),
   housingType: z.string().optional(),
   experience: z.string().max(5000).optional(),
   whyFoster: z.string().max(5000).optional(),
@@ -21,11 +21,11 @@ const fosterApplicationSchema = z.object({
 
 // Map foster type IDs to readable names
 const fosterTypeLabels: Record<string, string> = {
-  "bottle-baby": "Bottle Baby Kittens",
-  "weaned-kittens": "Weaned Kittens",
-  "adult-cats": "Adult Cats",
-  "dogs": "Dogs",
+  "short-term": "Short-Term Foster",
   "medical": "Medical Foster",
+  "socialization": "Socialization Foster",
+  "bottle-baby": "Bottle Baby Foster",
+  "hospice": "Hospice Foster",
 };
 
 export async function POST(request: NextRequest) {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       name,
       email,
       phone,
-      fosterType,
+      fosterTypes,
       hasOtherPets,
       hasKids,
       housingType,
@@ -60,17 +60,17 @@ export async function POST(request: NextRequest) {
     const supabase = createServerSupabase();
 
     try {
-      const result = await supabase.from("volunteers").insert({
+      const dbResult = await supabase.from("volunteers").insert({
         name,
         email,
         phone,
-        skills: ["foster", ...(fosterType || [])],
+        skills: ["foster", ...(fosterTypes || [])],
         is_foster_approved: false,
         background_check: false,
         status: "pending",
         notes: JSON.stringify({
           applicationType: "foster",
-          fosterTypes: fosterType,
+          fosterTypes,
           hasOtherPets,
           hasKids,
           housingType,
@@ -79,19 +79,19 @@ export async function POST(request: NextRequest) {
         }),
       });
 
-      if (result.error) {
-        console.error("Supabase error:", result.error);
+      if (dbResult.error) {
+        console.error("Supabase error:", dbResult.error);
       }
     } catch {
       console.log("Foster application received (DB not configured):", {
         name,
         email,
-        fosterType,
+        fosterTypes,
       });
     }
 
     // Get readable foster types
-    const fosterTypesReadable = (fosterType || [])
+    const fosterTypesReadable = (fosterTypes || [])
       .map((type: string) => fosterTypeLabels[type] || type)
       .join(", ");
 
@@ -109,8 +109,8 @@ export async function POST(request: NextRequest) {
         <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
         <p><strong>Foster Types:</strong> ${escapeHtml(fosterTypesReadable || "None specified")}</p>
         <p><strong>Housing:</strong> ${escapeHtml(housingType || "Not specified")}</p>
-        <p><strong>Has Other Pets:</strong> ${hasOtherPets ? "Yes" : "No"}</p>
-        <p><strong>Has Kids:</strong> ${hasKids ? "Yes" : "No"}</p>
+        <p><strong>Other Pets:</strong> ${escapeHtml(hasOtherPets || "Not specified")}</p>
+        <p><strong>Children:</strong> ${escapeHtml(hasKids || "Not specified")}</p>
         ${experience ? `<p><strong>Experience:</strong> ${sanitizeForHtml(experience, { preserveNewlines: true })}</p>` : ""}
         ${whyFoster ? `<p><strong>Why They Want to Foster:</strong></p><div style="background: #f9fafb; padding: 15px; border-radius: 8px;">${sanitizeForHtml(whyFoster, { preserveNewlines: true })}</div>` : ""}
         <a href="mailto:${escapeHtml(email)}" class="button">Contact ${escapeHtml(name)}</a>

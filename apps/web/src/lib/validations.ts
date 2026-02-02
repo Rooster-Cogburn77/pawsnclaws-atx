@@ -85,9 +85,9 @@ export const volunteerSchema = z.object({
   roles: z.array(z.string()).min(1, "Please select at least one role"),
   experience: z.string().optional(),
   availability: z.string().optional(),
-  interests: z.string().optional(),
-  emergencyContact: z.string().optional(),
-  emergencyPhone: phoneOptionalSchema,
+  hasVehicle: z.boolean().optional(),
+  canFoster: z.boolean().optional(),
+  message: z.string().optional(),
   howHeard: z.string().optional(),
 });
 
@@ -101,17 +101,12 @@ export const fosterSchema = z.object({
   name: nameSchema,
   email: emailSchema,
   phone: phoneSchema,
-  address: z.string().min(1, "Address is required"),
-  housingType: z.enum(["house", "apartment", "condo", "other"], {
-    error: "Please select your housing type" }),
-  hasYard: z.boolean().optional(),
-  otherPets: z.string().optional(),
+  fosterTypes: z.array(z.string()).min(1, "Please select at least one foster type"),
+  hasOtherPets: z.string().optional(),
+  hasKids: z.string().optional(),
+  housingType: z.string().optional(),
   experience: z.string().optional(),
-  fosterType: z.enum(["cats", "dogs", "kittens", "puppies", "any"], {
-    error: "Please select what you'd like to foster" }),
-  availability: z.string().optional(),
-  emergencyVet: z.boolean().optional(),
-  notes: z.string().optional(),
+  whyFoster: z.string().optional(),
 });
 
 export type FosterFormData = z.infer<typeof fosterSchema>;
@@ -222,20 +217,11 @@ export const surrenderPreventionSchema = z.object({
   email: emailSchema,
   phone: phoneOptionalSchema,
   petInfo: z.string().min(1, "Please describe your pet(s)"),
-  reason: z.enum([
-    "housing",
-    "financial",
-    "behavioral",
-    "medical",
-    "moving",
-    "allergies",
-    "other",
-  ], {
-    error: "Please select the main reason" }),
-  situation: messageSchema,
-  timeline: z.enum(["immediate", "week", "month", "flexible"], {
-    error: "Please select your timeline" }),
-  assistanceNeeded: z.array(z.string()).optional(),
+  reasons: z.array(z.string()).min(1, "Please select at least one reason"),
+  otherReason: z.string().optional(),
+  timeline: z.string().min(1, "Please select a timeline"),
+  whatWouldHelp: z.string().optional(),
+  triedOptions: z.string().optional(),
 });
 
 export type SurrenderPreventionFormData = z.infer<typeof surrenderPreventionSchema>;
