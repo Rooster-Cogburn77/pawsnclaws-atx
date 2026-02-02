@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { siteConfig } from "@/data/site-config";
 
 const inter = Inter({
@@ -82,6 +83,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <ScrollToTop />
         {/* Skip link for accessibility */}
         <a
           href="#main-content"
