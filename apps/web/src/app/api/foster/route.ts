@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
+import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
+import { z } from "zod";
 
 const FOSTER_COORDINATOR_EMAIL = process.env.FOSTER_COORDINATOR_EMAIL || process.env.ADMIN_EMAIL || "foster@pawsnclaws.org";
+
+// Foster application schema
+const fosterApplicationSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(1, "Phone is required"),
+  fosterType: z.array(z.string()).optional(),
+  hasOtherPets: z.boolean().optional(),
+  hasKids: z.boolean().optional(),
+  housingType: z.string().optional(),
+  experience: z.string().max(5000).optional(),
+  whyFoster: z.string().max(5000).optional(),
+});
 
 // Map foster type IDs to readable names
 const fosterTypeLabels: Record<string, string> = {
@@ -16,6 +31,20 @@ const fosterTypeLabels: Record<string, string> = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // Validate with Zod schema
+    const result = fosterApplicationSchema.safeParse(body);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const error of result.error.issues) {
+        const path = error.path.join(".");
+        if (!errors[path]) {
+          errors[path] = error.message;
+        }
+      }
+      return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
+    }
+
     const {
       name,
       email,
@@ -26,14 +55,7 @@ export async function POST(request: NextRequest) {
       housingType,
       experience,
       whyFoster,
-    } = body;
-
-    if (!name || !email || !phone) {
-      return NextResponse.json(
-        { error: "Name, email, and phone are required" },
-        { status: 400 }
-      );
-    }
+    } = result.data;
 
     const supabase = createServerSupabase();
 
@@ -76,22 +98,22 @@ export async function POST(request: NextRequest) {
     // Send welcome email with next steps
     await emails.sendFosterWelcome(email, name, fosterTypesReadable || "General Foster");
 
-    // Send notification to foster coordinator
+    // Send notification to foster coordinator (with sanitized content)
     await sendEmail({
       to: FOSTER_COORDINATOR_EMAIL,
-      subject: `[New Foster Application] ${name}`,
+      subject: `[New Foster Application] ${escapeHtml(name)}`,
       html: emailTemplates.base(`
         <h2>New Foster Application</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Foster Types:</strong> ${fosterTypesReadable || "None specified"}</p>
-        <p><strong>Housing:</strong> ${housingType || "Not specified"}</p>
+        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
+        <p><strong>Foster Types:</strong> ${escapeHtml(fosterTypesReadable || "None specified")}</p>
+        <p><strong>Housing:</strong> ${escapeHtml(housingType || "Not specified")}</p>
         <p><strong>Has Other Pets:</strong> ${hasOtherPets ? "Yes" : "No"}</p>
         <p><strong>Has Kids:</strong> ${hasKids ? "Yes" : "No"}</p>
-        ${experience ? `<p><strong>Experience:</strong> ${experience}</p>` : ""}
-        ${whyFoster ? `<p><strong>Why They Want to Foster:</strong></p><div style="background: #f9fafb; padding: 15px; border-radius: 8px;">${whyFoster}</div>` : ""}
-        <a href="mailto:${email}" class="button">Contact ${name}</a>
+        ${experience ? `<p><strong>Experience:</strong> ${sanitizeForHtml(experience, { preserveNewlines: true })}</p>` : ""}
+        ${whyFoster ? `<p><strong>Why They Want to Foster:</strong></p><div style="background: #f9fafb; padding: 15px; border-radius: 8px;">${sanitizeForHtml(whyFoster, { preserveNewlines: true })}</div>` : ""}
+        <a href="mailto:${escapeHtml(email)}" class="button">Contact ${escapeHtml(name)}</a>
       `),
       replyTo: email,
     });

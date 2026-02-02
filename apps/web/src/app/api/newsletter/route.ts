@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { emails } from "@/lib/email";
+import { newsletterSchema } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email } = body;
 
-    // Validate email
-    if (!email || !email.includes("@")) {
+    // Validate with Zod schema
+    const result = newsletterSchema.safeParse(body);
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Valid email is required" },
+        { error: result.error.issues[0]?.message || "Invalid email" },
         { status: 400 }
       );
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = result.data.email.toLowerCase().trim();
 
     // Store in Supabase
     const { error } = await supabase.from("newsletter_subscribers").insert({

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { escapeHtml, sanitizeForHtml, sanitizePhone } from "@/lib/sanitize";
+import { surrenderPreventionSchema } from "@/lib/validations";
 
 const VOLUNTEER_COORDINATOR_EMAIL = process.env.VOLUNTEER_COORDINATOR_EMAIL || process.env.ADMIN_EMAIL || "coordinator@pawsnclaws.org";
 
@@ -19,32 +21,39 @@ const reasonLabels: Record<string, string> = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // Validate with Zod schema
+    const result = surrenderPreventionSchema.safeParse(body);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const error of result.error.issues) {
+        const path = error.path.join(".");
+        if (!errors[path]) {
+          errors[path] = error.message;
+        }
+      }
+      return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
+    }
+
     const {
       name,
       email,
       phone,
       petInfo,
-      reasons,
-      otherReason,
+      reason,
+      situation,
       timeline,
-      whatWouldHelp,
-      triedOptions,
-    } = body;
+      assistanceNeeded,
+    } = result.data;
 
-    if (!name || !phone || !petInfo) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    // Map reason to readable text
+    const reasonText = reasonLabels[reason] || reason;
+    const whatWouldHelp = assistanceNeeded?.join(", ");
+    const triedOptions = body.triedOptions;
 
     const supabase = createServerSupabase();
 
-    const reasonText = reasons.includes("other") && otherReason
-      ? [...reasons.filter((r: string) => r !== "other"), otherReason].join(", ")
-      : reasons.join(", ");
-
-    const isUrgent = timeline === "urgent";
+    const isUrgent = timeline === "immediate";
 
     try {
       const result = await supabase.from("surrender_prevention").insert({
@@ -58,7 +67,8 @@ export async function POST(request: NextRequest) {
         notes: JSON.stringify({
           timeline,
           triedOptions,
-          rawReasons: reasons,
+          situation,
+          rawReason: reason,
         }),
       });
 
@@ -69,36 +79,39 @@ export async function POST(request: NextRequest) {
       console.log("Surrender prevention case received (DB not configured):", {
         name,
         phone,
-        reasons,
+        reason,
         timeline,
       });
     }
 
-    // Get readable reason labels
-    const readableReasons = (reasons || [])
-      .map((r: string) => reasonLabels[r] || r)
-      .join(", ");
+    // Get readable reason label
+    const readableReason = reasonLabels[reason] || reason;
 
-    // Send alert email to volunteer coordinator
+    // Send alert email to volunteer coordinator (with sanitized content)
+    const sanitizedPhone = sanitizePhone(phone || "");
     await sendEmail({
       to: VOLUNTEER_COORDINATOR_EMAIL,
-      subject: `${isUrgent ? "[URGENT] " : ""}Surrender Prevention Case: ${name}`,
+      subject: `${isUrgent ? "[URGENT] " : ""}Surrender Prevention Case: ${escapeHtml(name)}`,
       html: emailTemplates.base(`
         ${isUrgent ? '<div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin-bottom: 20px;"><strong style="color: #dc2626;">URGENT CASE</strong> - Person needs help within 48 hours</div>' : ''}
         <h2>Surrender Prevention Case</h2>
-        <p><strong>Contact:</strong> ${name}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        ${email ? `<p><strong>Email:</strong> ${email}</p>` : ""}
+        <p><strong>Contact:</strong> ${escapeHtml(name)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(phone || "Not provided")}</p>
+        ${email ? `<p><strong>Email:</strong> ${escapeHtml(email)}</p>` : ""}
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
         <p><strong>Pet Info:</strong></p>
         <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
-          ${petInfo.replace(/\n/g, '<br>')}
+          ${sanitizeForHtml(petInfo, { preserveNewlines: true })}
         </div>
-        <p><strong>Reasons:</strong> ${readableReasons || reasonText}</p>
-        <p><strong>Timeline:</strong> ${timeline === "urgent" ? "Within 48 hours" : timeline === "soon" ? "Within a week" : "Exploring options"}</p>
-        ${whatWouldHelp ? `<p><strong>What Would Help:</strong> ${whatWouldHelp}</p>` : ""}
-        ${triedOptions ? `<p><strong>Already Tried:</strong> ${triedOptions}</p>` : ""}
-        <a href="tel:${phone.replace(/\D/g, '')}" class="button">Call ${name}</a>
+        <p><strong>Reason:</strong> ${escapeHtml(readableReason)}</p>
+        <p><strong>Situation:</strong></p>
+        <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+          ${sanitizeForHtml(situation, { preserveNewlines: true })}
+        </div>
+        <p><strong>Timeline:</strong> ${timeline === "immediate" ? "Within 48 hours" : timeline === "week" ? "Within a week" : timeline === "month" ? "Within a month" : "Flexible"}</p>
+        ${whatWouldHelp ? `<p><strong>What Would Help:</strong> ${escapeHtml(whatWouldHelp)}</p>` : ""}
+        ${triedOptions ? `<p><strong>Already Tried:</strong> ${sanitizeForHtml(triedOptions, { preserveNewlines: true })}</p>` : ""}
+        <a href="tel:${sanitizedPhone.replace(/\D/g, '')}" class="button">Call ${escapeHtml(name)}</a>
       `),
     });
 
@@ -108,7 +121,7 @@ export async function POST(request: NextRequest) {
         to: email,
         subject: "Resources to Help Keep Your Pet - PawsNClaws ATX",
         html: emailTemplates.base(`
-          <h2>We're Here to Help, ${name}</h2>
+          <h2>We're Here to Help, ${escapeHtml(name)}</h2>
           <p>We received your request and want you to know: <strong>you're not alone, and there are options</strong>.</p>
           <p>A volunteer coordinator will reach out ${isUrgent ? "within 24 hours" : "within a few days"} to discuss your situation.</p>
 

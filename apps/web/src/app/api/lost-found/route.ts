@@ -1,12 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
+import { lostFoundSchema } from "@/lib/validations";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // Validate with Zod schema
+    const result = lostFoundSchema.safeParse(body);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const error of result.error.issues) {
+        const path = error.path.join(".");
+        if (!errors[path]) {
+          errors[path] = error.message;
+        }
+      }
+      return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
+    }
+
     const {
       type,
       species,
@@ -19,14 +35,7 @@ export async function POST(request: NextRequest) {
       contactPhone,
       contactEmail,
       microchipId,
-    } = body;
-
-    if (!type || !species || !color || !description || !location || !contactName) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    } = result.data;
 
     const supabase = createServerSupabase();
 
@@ -62,30 +71,30 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Send notification email to admin
+    // Send notification email to admin (with sanitized content)
     await sendEmail({
       to: ADMIN_EMAIL,
-      subject: `[${isLost ? "Lost" : "Found"} Pet] ${species}${name ? ` named ${name}` : ""} - ${location}`,
+      subject: `[${isLost ? "Lost" : "Found"} Pet] ${escapeHtml(species)}${name ? ` named ${escapeHtml(name)}` : ""} - ${escapeHtml(location)}`,
       html: emailTemplates.base(`
         <h2>${isLost ? "Lost" : "Found"} Pet Report</h2>
         <div style="background: ${isLost ? '#fef2f2' : '#f0fdf4'}; border: 1px solid ${isLost ? '#fecaca' : '#bbf7d0'}; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
           <strong style="color: ${isLost ? '#dc2626' : '#16a34a'};">${isLost ? "LOST" : "FOUND"}</strong>
         </div>
-        <p><strong>Species:</strong> ${species}</p>
-        ${name ? `<p><strong>Name:</strong> ${name}</p>` : ''}
-        <p><strong>Breed:</strong> ${breed || "Unknown"}</p>
-        <p><strong>Color:</strong> ${color}</p>
-        <p><strong>Location:</strong> ${location}</p>
-        ${microchipId ? `<p><strong>Microchip ID:</strong> ${microchipId}</p>` : ''}
+        <p><strong>Species:</strong> ${escapeHtml(species)}</p>
+        ${name ? `<p><strong>Name:</strong> ${escapeHtml(name)}</p>` : ''}
+        <p><strong>Breed:</strong> ${escapeHtml(breed || "Unknown")}</p>
+        <p><strong>Color:</strong> ${escapeHtml(color)}</p>
+        <p><strong>Location:</strong> ${escapeHtml(location)}</p>
+        ${microchipId ? `<p><strong>Microchip ID:</strong> ${escapeHtml(microchipId)}</p>` : ''}
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
         <p><strong>Description:</strong></p>
         <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
-          ${description.replace(/\n/g, '<br>')}
+          ${sanitizeForHtml(description, { preserveNewlines: true })}
         </div>
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-        <p><strong>Contact:</strong> ${contactName}</p>
-        ${contactPhone ? `<p><strong>Phone:</strong> ${contactPhone}</p>` : ''}
-        ${contactEmail ? `<p><strong>Email:</strong> ${contactEmail}</p>` : ''}
+        <p><strong>Contact:</strong> ${escapeHtml(contactName)}</p>
+        ${contactPhone ? `<p><strong>Phone:</strong> ${escapeHtml(contactPhone)}</p>` : ''}
+        ${contactEmail ? `<p><strong>Email:</strong> ${escapeHtml(contactEmail)}</p>` : ''}
         <a href="https://pawsnclaws.org/lost-found" class="button">View All Reports</a>
       `),
     });
@@ -97,14 +106,14 @@ export async function POST(request: NextRequest) {
         subject: `Your ${isLost ? "Lost" : "Found"} Pet Report - PawsNClaws ATX`,
         html: emailTemplates.base(`
           <h2>Report Received</h2>
-          <p>Hi ${contactName},</p>
+          <p>Hi ${escapeHtml(contactName)},</p>
           <p>We've received your ${isLost ? "lost" : "found"} pet report and it's now visible on our <a href="https://pawsnclaws.org/lost-found">Lost & Found board</a>.</p>
 
           <h3>Your Report:</h3>
           <ul>
-            <li><strong>Type:</strong> ${species}${breed ? ` (${breed})` : ''}</li>
-            <li><strong>Color:</strong> ${color}</li>
-            <li><strong>Location:</strong> ${location}</li>
+            <li><strong>Type:</strong> ${escapeHtml(species)}${breed ? ` (${escapeHtml(breed)})` : ''}</li>
+            <li><strong>Color:</strong> ${escapeHtml(color)}</li>
+            <li><strong>Location:</strong> ${escapeHtml(location)}</li>
           </ul>
 
           ${isLost ? `

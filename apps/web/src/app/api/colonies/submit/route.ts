@@ -1,29 +1,28 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails } from "@/lib/email";
+import { colonySubmissionSchema } from "@/lib/validations";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
+    const body = await request.json();
 
-    // Validate required fields
-    if (!data.locationDescription || !data.estimatedCats || !data.submitterName || !data.submitterEmail) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    // Validate with Zod schema
+    const result = colonySubmissionSchema.safeParse(body);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const error of result.error.issues) {
+        const path = error.path.join(".");
+        if (!errors[path]) {
+          errors[path] = error.message;
+        }
+      }
+      return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.submitterEmail)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      );
-    }
+    const data = result.data;
 
     const supabase = createServerSupabase();
 
@@ -33,9 +32,9 @@ export async function POST(request: Request) {
         colony_name: data.colonyName || "Unnamed Colony",
         location_description: data.locationDescription,
         address: data.address,
-        latitude: data.latitude ? parseFloat(data.latitude) : null,
-        longitude: data.longitude ? parseFloat(data.longitude) : null,
-        estimated_cats: parseInt(data.estimatedCats),
+        latitude: data.latitude ?? null,
+        longitude: data.longitude ?? null,
+        estimated_cats: data.estimatedCats,
         tnr_status: data.tnrStatus || "unknown",
         has_caretaker: data.hasCaretaker || false,
         caretaker_contact: data.caretakerContact,
@@ -59,11 +58,11 @@ export async function POST(request: Request) {
       });
     }
 
-    // Send notification email to admin
+    // Send notification email to admin (sanitization handled in email templates)
     await emails.sendColonySubmissionNotification(ADMIN_EMAIL, {
       colonyName: data.colonyName || "Unnamed Colony",
       location: data.locationDescription,
-      estimatedCats: data.estimatedCats,
+      estimatedCats: String(data.estimatedCats),
       submitterName: data.submitterName,
       submitterEmail: data.submitterEmail,
       urgentNeeds: data.urgentNeeds,

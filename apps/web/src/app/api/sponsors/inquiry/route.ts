@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
+import { escapeHtml, sanitizeForHtml, sanitizeUrl } from "@/lib/sanitize";
+import { sponsorInquirySchema } from "@/lib/validations";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
@@ -15,22 +17,30 @@ const tierLabels: Record<string, string> = {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // Validate with Zod schema
+    const result = sponsorInquirySchema.safeParse(body);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const error of result.error.issues) {
+        const path = error.path.join(".");
+        if (!errors[path]) {
+          errors[path] = error.message;
+        }
+      }
+      return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
+    }
+
     const {
       companyName,
       contactName,
       contactEmail,
       contactPhone,
-      website,
-      message,
       tier,
-    } = body;
+      message,
+    } = result.data;
 
-    if (!companyName || !contactName || !contactEmail) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    const website = body.website;
 
     const supabase = createServerSupabase();
 
@@ -65,27 +75,28 @@ export async function POST(request: NextRequest) {
     // Send confirmation email to sponsor
     await emails.sendSponsorConfirmation(contactEmail, companyName);
 
-    // Send notification email to admin
+    // Send notification email to admin (with sanitized content)
+    const sanitizedWebsite = website ? sanitizeUrl(website) : "";
     await sendEmail({
       to: ADMIN_EMAIL,
-      subject: `[New Sponsor Inquiry] ${companyName} - ${tierLabels[tier] || tier}`,
+      subject: `[New Sponsor Inquiry] ${escapeHtml(companyName)} - ${tierLabels[tier || "bronze"] || tier}`,
       html: emailTemplates.base(`
         <h2>New Sponsor Partnership Inquiry</h2>
-        <p><strong>Company:</strong> ${companyName}</p>
-        <p><strong>Website:</strong> ${website ? `<a href="${website}">${website}</a>` : "Not provided"}</p>
-        <p><strong>Interested Tier:</strong> ${tierLabels[tier] || tier}</p>
+        <p><strong>Company:</strong> ${escapeHtml(companyName)}</p>
+        <p><strong>Website:</strong> ${sanitizedWebsite ? `<a href="${sanitizedWebsite}">${escapeHtml(website)}</a>` : "Not provided"}</p>
+        <p><strong>Interested Tier:</strong> ${tierLabels[tier || "bronze"] || escapeHtml(tier || "Not specified")}</p>
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-        <p><strong>Contact:</strong> ${contactName}</p>
-        <p><strong>Email:</strong> ${contactEmail}</p>
-        <p><strong>Phone:</strong> ${contactPhone || "Not provided"}</p>
+        <p><strong>Contact:</strong> ${escapeHtml(contactName)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(contactEmail)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(contactPhone || "Not provided")}</p>
         ${message ? `
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
         <p><strong>Message:</strong></p>
         <div style="background: #f9fafb; padding: 15px; border-radius: 8px;">
-          ${message.replace(/\n/g, '<br>')}
+          ${sanitizeForHtml(message, { preserveNewlines: true })}
         </div>
         ` : ''}
-        <a href="mailto:${contactEmail}" class="button" style="margin-top: 20px;">Contact ${contactName}</a>
+        <a href="mailto:${escapeHtml(contactEmail)}" class="button" style="margin-top: 20px;">Contact ${escapeHtml(contactName)}</a>
       `),
       replyTo: contactEmail,
     });

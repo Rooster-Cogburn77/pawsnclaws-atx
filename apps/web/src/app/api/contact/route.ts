@@ -1,20 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { emails } from "@/lib/email";
+import { contactSchema } from "@/lib/validations";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pawsnclaws.org";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, reason, message } = body;
 
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: "Name, email, and message are required" },
-        { status: 400 }
-      );
+    // Validate with Zod schema
+    const result = contactSchema.safeParse(body);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      for (const error of result.error.issues) {
+        const path = error.path.join(".");
+        if (!errors[path]) {
+          errors[path] = error.message;
+        }
+      }
+      return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
     }
+
+    const { name, email, reason, message } = result.data;
 
     const supabase = createServerSupabase();
 

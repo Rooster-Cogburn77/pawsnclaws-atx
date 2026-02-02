@@ -7,6 +7,8 @@
  * Resend is recommended for Next.js projects - sign up at https://resend.com
  */
 
+import { escapeHtml, sanitizeForHtml } from "./sanitize";
+
 interface EmailOptions {
   to: string | string[];
   subject: string;
@@ -59,7 +61,7 @@ const templates = {
 
   // Contact form confirmation
   contactConfirmation: (name: string) => templates.base(`
-    <h2>Thanks for reaching out, ${name}!</h2>
+    <h2>Thanks for reaching out, ${escapeHtml(name)}!</h2>
     <p>We've received your message and will get back to you within 24-48 hours.</p>
     <p>In the meantime, check out our <a href="https://pawsnclaws.org/resources">resources</a> for helpful information.</p>
     <p>Best,<br>The PawsNClaws Team</p>
@@ -68,22 +70,22 @@ const templates = {
   // Admin notification for contact form
   contactNotification: (data: { name: string; email: string; subject: string; message: string }) => templates.base(`
     <h2>New Contact Form Submission</h2>
-    <p><strong>From:</strong> ${data.name} (${data.email})</p>
-    <p><strong>Subject:</strong> ${data.subject}</p>
+    <p><strong>From:</strong> ${escapeHtml(data.name)} (${escapeHtml(data.email)})</p>
+    <p><strong>Subject:</strong> ${escapeHtml(data.subject)}</p>
     <p><strong>Message:</strong></p>
     <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin: 15px 0;">
-      ${data.message.replace(/\n/g, '<br>')}
+      ${sanitizeForHtml(data.message, { preserveNewlines: true })}
     </div>
-    <a href="mailto:${data.email}" class="button">Reply to ${data.name}</a>
+    <a href="mailto:${escapeHtml(data.email)}" class="button">Reply to ${escapeHtml(data.name)}</a>
   `),
 
   // Volunteer welcome
   volunteerWelcome: (name: string, roles: string[]) => templates.base(`
-    <h2>Welcome to the Pack, ${name}!</h2>
+    <h2>Welcome to the Pack, ${escapeHtml(name)}!</h2>
     <p>Thank you for signing up to volunteer with PawsNClaws ATX. We're thrilled to have you join our mission!</p>
     <p><strong>You signed up for:</strong></p>
     <ul>
-      ${roles.map(role => `<li>${role}</li>`).join('')}
+      ${roles.map(role => `<li>${escapeHtml(role)}</li>`).join('')}
     </ul>
     <p>A volunteer coordinator will reach out within the next few days to discuss next steps and answer any questions.</p>
     <a href="https://pawsnclaws.org/events" class="button">View Upcoming Events</a>
@@ -91,9 +93,9 @@ const templates = {
 
   // Foster welcome
   fosterWelcome: (name: string, fosterType: string) => templates.base(`
-    <h2>Thank You for Applying to Foster, ${name}!</h2>
+    <h2>Thank You for Applying to Foster, ${escapeHtml(name)}!</h2>
     <p>We're so grateful you want to open your home to animals in need.</p>
-    <p><strong>Foster Type:</strong> ${fosterType}</p>
+    <p><strong>Foster Type:</strong> ${escapeHtml(fosterType)}</p>
     <h3>Next Steps:</h3>
     <ol>
       <li>Our foster coordinator will review your application (1-3 business days)</li>
@@ -105,7 +107,7 @@ const templates = {
 
   // Deposit assistance confirmation
   depositConfirmation: (name: string, amount: number) => templates.base(`
-    <h2>Application Received, ${name}</h2>
+    <h2>Application Received, ${escapeHtml(name)}</h2>
     <p>We've received your pet deposit assistance application for $${amount.toLocaleString()}.</p>
     <h3>What Happens Next:</h3>
     <ol>
@@ -120,8 +122,8 @@ const templates = {
   // Vet fund confirmation
   vetFundConfirmation: (name: string, petName: string) => templates.base(`
     <h2>Emergency Vet Fund Application Received</h2>
-    <p>Hi ${name},</p>
-    <p>We've received your emergency vet fund application for ${petName}. We understand this is a stressful time.</p>
+    <p>Hi ${escapeHtml(name)},</p>
+    <p>We've received your emergency vet fund application for ${escapeHtml(petName)}. We understand this is a stressful time.</p>
     <h3>Timeline:</h3>
     <ul>
       <li><strong>Emergency cases:</strong> 24-48 hours</li>
@@ -133,17 +135,17 @@ const templates = {
 
   // Lost pet alert
   lostPetAlert: (data: { petName: string; species: string; location: string; description: string }) => templates.base(`
-    <h2>Lost Pet Alert: ${data.petName}</h2>
-    <p><strong>Species:</strong> ${data.species}</p>
-    <p><strong>Last Seen:</strong> ${data.location}</p>
-    <p><strong>Description:</strong> ${data.description}</p>
+    <h2>Lost Pet Alert: ${escapeHtml(data.petName)}</h2>
+    <p><strong>Species:</strong> ${escapeHtml(data.species)}</p>
+    <p><strong>Last Seen:</strong> ${escapeHtml(data.location)}</p>
+    <p><strong>Description:</strong> ${sanitizeForHtml(data.description, { preserveNewlines: true })}</p>
     <a href="https://pawsnclaws.org/lost-found" class="button">View Lost & Found Board</a>
     <p style="margin-top: 20px; font-size: 14px;">If you've seen this pet, please contact the owner through our website or call Austin 311.</p>
   `),
 
   // Sponsor inquiry confirmation
   sponsorConfirmation: (companyName: string) => templates.base(`
-    <h2>Thank You for Your Interest, ${companyName}!</h2>
+    <h2>Thank You for Your Interest, ${escapeHtml(companyName)}!</h2>
     <p>We're excited about the possibility of partnering with you to help Austin's animals.</p>
     <p>A member of our partnerships team will reach out within 2-3 business days to discuss sponsorship opportunities.</p>
     <h3>In the meantime:</h3>
@@ -165,7 +167,7 @@ const templates = {
       <li>Ways to help Austin's animals</li>
     </ul>
     <p style="font-size: 12px; color: #6b7280;">
-      Subscribed: ${email}<br>
+      Subscribed: ${escapeHtml(email)}<br>
       <a href="https://pawsnclaws.org/unsubscribe">Unsubscribe</a>
     </p>
   `),
@@ -173,14 +175,14 @@ const templates = {
   // Colony submission notification
   colonySubmission: (data: { colonyName: string; location: string; estimatedCats: string; submitterName: string; submitterEmail: string; urgentNeeds?: string }) => templates.base(`
     <h2>New Colony Submission</h2>
-    <p><strong>Colony Name:</strong> ${data.colonyName}</p>
-    <p><strong>Location:</strong> ${data.location}</p>
-    <p><strong>Estimated Cats:</strong> ${data.estimatedCats}</p>
-    <p><strong>Submitted by:</strong> ${data.submitterName} (${data.submitterEmail})</p>
+    <p><strong>Colony Name:</strong> ${escapeHtml(data.colonyName)}</p>
+    <p><strong>Location:</strong> ${escapeHtml(data.location)}</p>
+    <p><strong>Estimated Cats:</strong> ${escapeHtml(data.estimatedCats)}</p>
+    <p><strong>Submitted by:</strong> ${escapeHtml(data.submitterName)} (${escapeHtml(data.submitterEmail)})</p>
     ${data.urgentNeeds ? `
     <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin: 15px 0;">
       <p style="color: #dc2626; font-weight: bold; margin: 0 0 10px 0;">⚠️ Urgent Needs:</p>
-      <p style="margin: 0;">${data.urgentNeeds}</p>
+      <p style="margin: 0;">${sanitizeForHtml(data.urgentNeeds, { preserveNewlines: true })}</p>
     </div>
     ` : ''}
     <a href="https://pawsnclaws.org/admin/colonies" class="button">Review in Admin</a>
