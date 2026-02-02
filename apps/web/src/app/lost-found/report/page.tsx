@@ -1,63 +1,70 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { lostFoundSchema, type LostFoundFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, SubmitButton } from "@/components/FormField";
+
+const speciesOptions = [
+  { value: "dog", label: "Dog" },
+  { value: "cat", label: "Cat" },
+  { value: "other", label: "Other" },
+];
 
 function ReportFormContent() {
   const searchParams = useSearchParams();
   const initialType = searchParams.get("type") === "found" ? "found" : "lost";
 
-  const [formData, setFormData] = useState({
-    type: initialType,
+  const defaultValues: LostFoundFormData = {
+    type: initialType as "lost" | "found",
     species: "dog",
     breed: "",
     name: "",
     color: "",
     description: "",
     location: "",
+    date: new Date().toISOString().split("T")[0],
     contactName: "",
     contactPhone: "",
     contactEmail: "",
     microchipId: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+    photos: [],
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
+  const form = useFormValidation({
+    schema: lostFoundSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
       const response = await fetch("/api/lost-found", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
-      if (response.ok) {
-        setSubmitted(true);
-      }
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      const result = await response.json();
 
-  if (submitted) {
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit report");
+      }
+    },
+  });
+
+  const isLost = form.values.type === "lost";
+
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white flex items-center justify-center px-4">
         <div className="max-w-lg text-center">
           <div className="text-6xl mb-6">
-            {formData.type === "lost" ? "🔴" : "🟢"}
+            {isLost ? "🔴" : "🟢"}
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Report Submitted
           </h1>
           <p className="text-gray-600 mb-6">
-            {formData.type === "lost"
+            {isLost
               ? "We've posted your lost pet report. We hope you're reunited soon!"
               : "Thank you for reporting this found pet. You're helping get them home!"}
           </p>
@@ -80,8 +87,6 @@ function ReportFormContent() {
     );
   }
 
-  const isLost = formData.type === "lost";
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-12 px-4">
       <div className="max-w-2xl mx-auto">
@@ -97,14 +102,18 @@ function ReportFormContent() {
         </div>
 
         <form
-          onSubmit={handleSubmit}
+          onSubmit={form.handleSubmit}
           className="bg-white rounded-2xl shadow-xl p-8"
         >
+          {form.submitError && (
+            <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+          )}
+
           {/* Type Toggle */}
           <div className="flex rounded-lg bg-gray-100 p-1 mb-6">
             <button
               type="button"
-              onClick={() => setFormData({ ...formData, type: "lost" })}
+              onClick={() => form.setValue("type", "lost")}
               className={`flex-1 py-3 px-4 rounded-md font-medium transition-all ${
                 isLost
                   ? "bg-red-500 text-white shadow"
@@ -115,7 +124,7 @@ function ReportFormContent() {
             </button>
             <button
               type="button"
-              onClick={() => setFormData({ ...formData, type: "found" })}
+              onClick={() => form.setValue("type", "found")}
               className={`flex-1 py-3 px-4 rounded-md font-medium transition-all ${
                 !isLost
                   ? "bg-green-500 text-white shadow"
@@ -129,119 +138,115 @@ function ReportFormContent() {
           {/* Pet Info */}
           <h3 className="font-bold text-gray-900 mb-4">Pet Information</h3>
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Species *
-              </label>
-              <select
-                value={formData.species}
-                onChange={(e) =>
-                  setFormData({ ...formData, species: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-              >
-                <option value="dog">Dog</option>
-                <option value="cat">Cat</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Breed
-              </label>
-              <input
-                type="text"
-                value={formData.breed}
-                onChange={(e) =>
-                  setFormData({ ...formData, breed: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                placeholder="e.g. Labrador, Tabby"
-              />
-            </div>
+            <SelectField
+              label="Species"
+              name="species"
+              value={form.values.species}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("species")}
+              touched={form.isFieldTouched("species")}
+              options={speciesOptions}
+              required
+            />
+            <FormField
+              label="Breed"
+              name="breed"
+              type="text"
+              value={form.values.breed || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("breed")}
+              touched={form.isFieldTouched("breed")}
+              placeholder="e.g. Labrador, Tabby"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             {isLost && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Pet Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
+              <FormField
+                label="Pet Name"
+                name="name"
+                type="text"
+                value={form.values.name || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("name")}
+                touched={form.isFieldTouched("name")}
+              />
             )}
             <div className={isLost ? "" : "col-span-2"}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Color/Markings *
-              </label>
-              <input
+              <FormField
+                label="Color/Markings"
+                name="color"
                 type="text"
-                required
-                value={formData.color}
-                onChange={(e) =>
-                  setFormData({ ...formData, color: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
+                value={form.values.color}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("color")}
+                touched={form.isFieldTouched("color")}
                 placeholder="e.g. Black and white, orange tabby"
+                required
               />
             </div>
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description *
-            </label>
-            <textarea
-              required
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
+            <TextareaField
+              label="Description"
+              name="description"
+              value={form.values.description}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("description")}
+              touched={form.isFieldTouched("description")}
               rows={3}
               placeholder={
                 isLost
                   ? "Describe your pet, any distinguishing features, collar, tags, temperament..."
                   : "Describe the pet, where exactly you found them, their condition..."
               }
+              required
             />
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {isLost ? "Last Seen Location *" : "Found Location *"}
-            </label>
-            <input
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <FormField
+              label={isLost ? "Last Seen Location" : "Found Location"}
+              name="location"
               type="text"
-              required
-              value={formData.location}
-              onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
-              }
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
+              value={form.values.location}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("location")}
+              touched={form.isFieldTouched("location")}
               placeholder="Be specific: street, neighborhood, landmarks"
+              required
+            />
+            <FormField
+              label="Date"
+              name="date"
+              type="date"
+              value={form.values.date}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("date")}
+              touched={form.isFieldTouched("date")}
+              required
             />
           </div>
 
           {isLost && (
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Microchip ID (if known)
-              </label>
-              <input
+              <FormField
+                label="Microchip ID (if known)"
+                name="microchipId"
                 type="text"
-                value={formData.microchipId}
-                onChange={(e) =>
-                  setFormData({ ...formData, microchipId: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
+                value={form.values.microchipId || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("microchipId")}
+                touched={form.isFieldTouched("microchipId")}
               />
             </div>
           )}
@@ -251,61 +256,52 @@ function ReportFormContent() {
             Your Contact Information
           </h3>
           <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.contactName}
-                onChange={(e) =>
-                  setFormData({ ...formData, contactName: e.target.value })
-                }
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-              />
-            </div>
+            <FormField
+              label="Name"
+              name="contactName"
+              type="text"
+              value={form.values.contactName}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("contactName")}
+              touched={form.isFieldTouched("contactName")}
+              required
+            />
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  value={formData.contactPhone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, contactPhone: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={formData.contactEmail}
-                  onChange={(e) =>
-                    setFormData({ ...formData, contactEmail: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                />
-              </div>
+              <FormField
+                label="Phone"
+                name="contactPhone"
+                type="tel"
+                value={form.values.contactPhone}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("contactPhone")}
+                touched={form.isFieldTouched("contactPhone")}
+                required
+              />
+              <FormField
+                label="Email"
+                name="contactEmail"
+                type="email"
+                value={form.values.contactEmail}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("contactEmail")}
+                touched={form.isFieldTouched("contactEmail")}
+                required
+              />
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full py-4 font-bold text-white rounded-xl transition-colors ${
-              isLost
-                ? "bg-red-500 hover:bg-red-600 disabled:bg-red-300"
-                : "bg-green-500 hover:bg-green-600 disabled:bg-green-300"
-            }`}
+          <SubmitButton
+            isSubmitting={form.isSubmitting}
+            isValid={form.isValid}
+            loadingText="Submitting..."
           >
-            {isSubmitting ? "Submitting..." : `Submit ${isLost ? "Lost" : "Found"} Report`}
-          </button>
+            <span className={isLost ? "text-white" : "text-white"}>
+              Submit {isLost ? "Lost" : "Found"} Report
+            </span>
+          </SubmitButton>
         </form>
       </div>
     </div>

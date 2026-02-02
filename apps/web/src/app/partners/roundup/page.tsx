@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { roundupPartnerSchema, type RoundupPartnerFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, SubmitButton } from "@/components/FormField";
 
 // Sample partner businesses
 const samplePartners = [
@@ -74,31 +76,50 @@ const benefits = [
   },
 ];
 
+const businessTypeOptions = [
+  { value: "", label: "Select..." },
+  { value: "restaurant", label: "Restaurant/Cafe" },
+  { value: "retail", label: "Retail Store" },
+  { value: "pet", label: "Pet Store/Services" },
+  { value: "bar", label: "Bar/Brewery" },
+  { value: "other", label: "Other" },
+];
+
+const defaultValues: RoundupPartnerFormData = {
+  businessName: "",
+  contactName: "",
+  email: "",
+  phone: "",
+  businessType: "",
+  locations: "",
+  posSystem: "",
+  message: "",
+};
+
 export default function RoundUpPartnersPage() {
-  const [formData, setFormData] = useState({
-    businessName: "",
-    contactName: "",
-    email: "",
-    phone: "",
-    businessType: "",
-    locations: "",
-    posSystem: "",
-    message: "",
+  const form = useFormValidation({
+    schema: roundupPartnerSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.contactName,
+          email: data.email,
+          subject: `Round-Up Partner Inquiry: ${data.businessName}`,
+          message: `Round-Up Partner Inquiry\n\nBusiness: ${data.businessName}\nType: ${data.businessType || "Not specified"}\nLocations: ${data.locations || "Not specified"}\nPOS System: ${data.posSystem || "Not specified"}\n\nMessage: ${data.message || "No additional message"}`,
+          type: "roundup-partner",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit inquiry");
+      }
+    },
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    console.log("Round-up partner inquiry:", formData);
-    setSubmitted(true);
-    setIsSubmitting(false);
-  };
 
   const totalRaised = samplePartners.reduce((sum, p) => sum + p.raised, 0);
 
@@ -197,7 +218,7 @@ export default function RoundUpPartnersPage() {
         </div>
 
         {/* Partner Signup Form */}
-        {submitted ? (
+        {form.submitSuccess ? (
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
             <span className="text-4xl mb-4 block">🎉</span>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -218,119 +239,109 @@ export default function RoundUpPartnersPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Become a Partner
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={form.handleSubmit} className="space-y-4">
+              {form.submitError && (
+                <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+              )}
+
               <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Business Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.businessName}
-                    onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contact Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.contactName}
-                    onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Business Type
-                  </label>
-                  <select
-                    value={formData.businessType}
-                    onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  >
-                    <option value="">Select...</option>
-                    <option value="restaurant">Restaurant/Cafe</option>
-                    <option value="retail">Retail Store</option>
-                    <option value="pet">Pet Store/Services</option>
-                    <option value="bar">Bar/Brewery</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Number of Locations
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.locations}
-                    onChange={(e) => setFormData({ ...formData, locations: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                    placeholder="e.g., 1, 3, 10+"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  POS System (if known)
-                </label>
-                <input
+                <FormField
+                  label="Business Name"
+                  name="businessName"
                   type="text"
-                  value={formData.posSystem}
-                  onChange={(e) => setFormData({ ...formData, posSystem: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none"
-                  placeholder="e.g., Square, Toast, Clover"
+                  value={form.values.businessName}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("businessName")}
+                  touched={form.isFieldTouched("businessName")}
+                  required
+                />
+                <FormField
+                  label="Contact Name"
+                  name="contactName"
+                  type="text"
+                  value={form.values.contactName}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("contactName")}
+                  touched={form.isFieldTouched("contactName")}
+                  required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Anything else we should know?
-                </label>
-                <textarea
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:outline-none resize-none"
-                  rows={3}
+              <div className="grid md:grid-cols-2 gap-4">
+                <FormField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={form.values.email}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("email")}
+                  touched={form.isFieldTouched("email")}
+                  required
+                />
+                <FormField
+                  label="Phone"
+                  name="phone"
+                  type="tel"
+                  value={form.values.phone || ""}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("phone")}
+                  touched={form.isFieldTouched("phone")}
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white font-bold rounded-xl transition-colors"
+              <div className="grid md:grid-cols-2 gap-4">
+                <SelectField
+                  label="Business Type"
+                  name="businessType"
+                  value={form.values.businessType || ""}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("businessType")}
+                  touched={form.isFieldTouched("businessType")}
+                  options={businessTypeOptions}
+                />
+                <FormField
+                  label="Number of Locations"
+                  name="locations"
+                  type="text"
+                  value={form.values.locations || ""}
+                  onChange={form.handleChange}
+                  onBlur={form.handleBlur}
+                  error={form.getFieldError("locations")}
+                  touched={form.isFieldTouched("locations")}
+                  placeholder="e.g., 1, 3, 10+"
+                />
+              </div>
+              <FormField
+                label="POS System (if known)"
+                name="posSystem"
+                type="text"
+                value={form.values.posSystem || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("posSystem")}
+                touched={form.isFieldTouched("posSystem")}
+                placeholder="e.g., Square, Toast, Clover"
+              />
+              <TextareaField
+                label="Anything else we should know?"
+                name="message"
+                value={form.values.message || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("message")}
+                touched={form.isFieldTouched("message")}
+                rows={3}
+              />
+              <SubmitButton
+                isSubmitting={form.isSubmitting}
+                isValid={form.isValid}
+                loadingText="Submitting..."
               >
-                {isSubmitting ? "Submitting..." : "Request Partnership Info"}
-              </button>
+                Request Partnership Info
+              </SubmitButton>
             </form>
           </div>
         )}

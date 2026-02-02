@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { charlotteColonySchema, type CharlotteColonyFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, SubmitButton } from "@/components/FormField";
 
 const urgentNeedOptions = [
   { value: "tnr-needed", label: "TNR needed (unfixed cats)" },
@@ -12,41 +15,79 @@ const urgentNeedOptions = [
   { value: "threatened", label: "Colony is threatened (eviction, etc.)" },
 ];
 
+const tnrStatusOptions = [
+  { value: "", label: "Select..." },
+  { value: "all", label: "All cats are fixed (ear-tipped)" },
+  { value: "partial", label: "Some cats are fixed" },
+  { value: "none", label: "No cats are fixed" },
+  { value: "unknown", label: "Unknown" },
+];
+
+const caretakerOptions = [
+  { value: "", label: "Select..." },
+  { value: "yes", label: "Yes" },
+  { value: "no", label: "No" },
+  { value: "unknown", label: "Unknown" },
+];
+
+const relationOptions = [
+  { value: "", label: "Select..." },
+  { value: "caretaker", label: "I am the caretaker" },
+  { value: "neighbor", label: "Neighbor/nearby resident" },
+  { value: "observer", label: "Just observed them" },
+  { value: "property", label: "Property owner/manager" },
+  { value: "other", label: "Other" },
+];
+
+const defaultValues: CharlotteColonyFormData = {
+  colonyName: "",
+  locationDescription: "",
+  address: "",
+  estimatedCats: "",
+  tnrStatus: "",
+  hasCaretaker: "",
+  urgentNeeds: [],
+  additionalInfo: "",
+  submitterName: "",
+  submitterEmail: "",
+  submitterPhone: "",
+  submitterRelation: "",
+};
+
 export default function CharlotteSubmitColonyPage() {
-  const [formData, setFormData] = useState({
-    colonyName: "",
-    locationDescription: "",
-    address: "",
-    estimatedCats: "",
-    tnrStatus: "",
-    hasCaretaker: "",
-    caretakerContact: "",
-    feedingSchedule: "",
-    urgentNeeds: [] as string[],
-    additionalInfo: "",
-    submitterName: "",
-    submitterEmail: "",
-    submitterPhone: "",
-    submitterRelation: "",
+  const [selectedNeeds, setSelectedNeeds] = useState<string[]>([]);
+
+  const form = useFormValidation({
+    schema: charlotteColonySchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
+      const response = await fetch("/api/colonies/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          urgentNeeds: selectedNeeds.join(", "),
+          city: "charlotte",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit colony");
+      }
+    },
   });
-  const [submitted, setSubmitted] = useState(false);
 
   const toggleNeed = (need: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      urgentNeeds: prev.urgentNeeds.includes(need)
-        ? prev.urgentNeeds.filter((n) => n !== need)
-        : [...prev.urgentNeeds, need],
-    }));
+    setSelectedNeeds((prev) =>
+      prev.includes(need)
+        ? prev.filter((n) => n !== need)
+        : [...prev, need]
+    );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Charlotte colony submission:", formData);
-    setSubmitted(true);
-  };
-
-  if (submitted) {
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white py-16">
         <div className="max-w-xl mx-auto px-4 text-center">
@@ -98,99 +139,91 @@ export default function CharlotteSubmitColonyPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
+        <form onSubmit={form.handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
           {/* Colony Info */}
           <h2 className="text-xl font-bold text-gray-900 mb-6">Colony Information</h2>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Colony Name (optional)
-              </label>
-              <input
-                type="text"
-                value={formData.colonyName}
-                onChange={(e) => setFormData({ ...formData, colonyName: e.target.value })}
-                placeholder="e.g., 'The Park Street Cats'"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Estimated Number of Cats *
-              </label>
-              <input
-                type="number"
-                required
-                min="1"
-                value={formData.estimatedCats}
-                onChange={(e) => setFormData({ ...formData, estimatedCats: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-          </div>
+          {form.submitError && (
+            <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+          )}
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Location Description *
-            </label>
-            <textarea
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <FormField
+              label="Colony Name (optional)"
+              name="colonyName"
+              type="text"
+              value={form.values.colonyName || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("colonyName")}
+              touched={form.isFieldTouched("colonyName")}
+              placeholder="e.g., 'The Park Street Cats'"
+            />
+            <FormField
+              label="Estimated Number of Cats"
+              name="estimatedCats"
+              type="number"
+              value={form.values.estimatedCats}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("estimatedCats")}
+              touched={form.isFieldTouched("estimatedCats")}
               required
-              value={formData.locationDescription}
-              onChange={(e) => setFormData({ ...formData, locationDescription: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none resize-none"
-              placeholder="Describe where the cats gather (e.g., 'Behind the shopping center near the dumpsters')"
             />
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Address or Cross Streets (approximate is fine)
-            </label>
-            <input
+            <TextareaField
+              label="Location Description"
+              name="locationDescription"
+              value={form.values.locationDescription}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("locationDescription")}
+              touched={form.isFieldTouched("locationDescription")}
+              rows={3}
+              placeholder="Describe where the cats gather (e.g., 'Behind the shopping center near the dumpsters')"
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <FormField
+              label="Address or Cross Streets (approximate is fine)"
+              name="address"
               type="text"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
+              value={form.values.address || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("address")}
+              touched={form.isFieldTouched("address")}
             />
           </div>
 
           {/* TNR Status */}
           <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                TNR Status *
-              </label>
-              <select
-                required
-                value={formData.tnrStatus}
-                onChange={(e) => setFormData({ ...formData, tnrStatus: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              >
-                <option value="">Select...</option>
-                <option value="all">All cats are fixed (ear-tipped)</option>
-                <option value="partial">Some cats are fixed</option>
-                <option value="none">No cats are fixed</option>
-                <option value="unknown">Unknown</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Is there a regular caretaker? *
-              </label>
-              <select
-                required
-                value={formData.hasCaretaker}
-                onChange={(e) => setFormData({ ...formData, hasCaretaker: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              >
-                <option value="">Select...</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-                <option value="unknown">Unknown</option>
-              </select>
-            </div>
+            <SelectField
+              label="TNR Status"
+              name="tnrStatus"
+              value={form.values.tnrStatus}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("tnrStatus")}
+              touched={form.isFieldTouched("tnrStatus")}
+              options={tnrStatusOptions}
+              required
+            />
+            <SelectField
+              label="Is there a regular caretaker?"
+              name="hasCaretaker"
+              value={form.values.hasCaretaker}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("hasCaretaker")}
+              touched={form.isFieldTouched("hasCaretaker")}
+              options={caretakerOptions}
+              required
+            />
           </div>
 
           {/* Urgent Needs */}
@@ -205,7 +238,7 @@ export default function CharlotteSubmitColonyPage() {
                   type="button"
                   onClick={() => toggleNeed(option.value)}
                   className={`p-3 rounded-lg border text-left text-sm transition-all ${
-                    formData.urgentNeeds.includes(option.value)
+                    selectedNeeds.includes(option.value)
                       ? "border-red-500 bg-red-50 text-red-700"
                       : "border-gray-200 hover:border-red-300"
                   }`}
@@ -218,14 +251,15 @@ export default function CharlotteSubmitColonyPage() {
 
           {/* Additional Info */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Information
-            </label>
-            <textarea
-              value={formData.additionalInfo}
-              onChange={(e) => setFormData({ ...formData, additionalInfo: e.target.value })}
+            <TextareaField
+              label="Additional Information"
+              name="additionalInfo"
+              value={form.values.additionalInfo || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("additionalInfo")}
+              touched={form.isFieldTouched("additionalInfo")}
               rows={3}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none resize-none"
               placeholder="Any other details about the colony..."
             />
           </div>
@@ -236,68 +270,60 @@ export default function CharlotteSubmitColonyPage() {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.submitterName}
-                onChange={(e) => setFormData({ ...formData, submitterName: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.submitterEmail}
-                onChange={(e) => setFormData({ ...formData, submitterEmail: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone (optional)
-              </label>
-              <input
-                type="tel"
-                value={formData.submitterPhone}
-                onChange={(e) => setFormData({ ...formData, submitterPhone: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Relationship to Colony *
-              </label>
-              <select
-                required
-                value={formData.submitterRelation}
-                onChange={(e) => setFormData({ ...formData, submitterRelation: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              >
-                <option value="">Select...</option>
-                <option value="caretaker">I am the caretaker</option>
-                <option value="neighbor">Neighbor/nearby resident</option>
-                <option value="observer">Just observed them</option>
-                <option value="property">Property owner/manager</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+            <FormField
+              label="Your Name"
+              name="submitterName"
+              type="text"
+              value={form.values.submitterName}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("submitterName")}
+              touched={form.isFieldTouched("submitterName")}
+              required
+            />
+            <FormField
+              label="Email"
+              name="submitterEmail"
+              type="email"
+              value={form.values.submitterEmail}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("submitterEmail")}
+              touched={form.isFieldTouched("submitterEmail")}
+              required
+            />
+            <FormField
+              label="Phone"
+              name="submitterPhone"
+              type="tel"
+              value={form.values.submitterPhone || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("submitterPhone")}
+              touched={form.isFieldTouched("submitterPhone")}
+            />
+            <SelectField
+              label="Your Relationship to Colony"
+              name="submitterRelation"
+              value={form.values.submitterRelation}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("submitterRelation")}
+              touched={form.isFieldTouched("submitterRelation")}
+              options={relationOptions}
+              required
+            />
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-4 bg-teal-600 text-white text-lg font-bold rounded-xl hover:bg-teal-700 transition-colors"
+          <SubmitButton
+            isSubmitting={form.isSubmitting}
+            isValid={form.isValid}
+            loadingText="Submitting..."
+            className="w-full py-4 bg-teal-600 text-white text-lg font-bold rounded-xl hover:bg-teal-700 transition-colors disabled:bg-gray-300"
           >
             Submit Colony Report
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </div>

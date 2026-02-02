@@ -1,48 +1,44 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { cityLeadSchema, type CityLeadFormData } from "@/lib/validations";
+import { FormField, TextareaField, FormError, SubmitButton } from "@/components/FormField";
+
+const defaultValues: CityLeadFormData = {
+  name: "",
+  email: "",
+  city: "",
+  phone: "",
+  experience: "",
+  whyInterested: "",
+  availability: "",
+};
 
 export default function CityLeadGuidePage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    city: "",
-    phone: "",
-    experience: "",
-    whyInterested: "",
-    availability: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
+  const form = useFormValidation({
+    schema: cityLeadSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
       const response = await fetch("/api/volunteer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
+          ...data,
           type: "city-lead",
-          message: `City Lead Application\n\nCity: ${formData.city}\nExperience: ${formData.experience}\nWhy Interested: ${formData.whyInterested}\nAvailability: ${formData.availability}`,
+          message: `City Lead Application\n\nCity: ${data.city}\nExperience: ${data.experience}\nWhy Interested: ${data.whyInterested}\nAvailability: ${data.availability}`,
         }),
       });
 
-      if (response.ok) {
-        setIsSubmitted(true);
-      }
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      const result = await response.json();
 
-  if (isSubmitted) {
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit application");
+      }
+    },
+  });
+
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-16 px-4">
         <div className="max-w-2xl mx-auto text-center">
@@ -210,111 +206,108 @@ export default function CityLeadGuidePage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Apply to Become a City Lead
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="Jane Doe"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="jane@example.com"
-                />
-              </div>
-            </div>
+          <form onSubmit={form.handleSubmit} className="space-y-6">
+            {form.submitError && (
+              <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+            )}
 
             <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City You&apos;d Lead *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="e.g., Denver, CO"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone (optional)
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="(555) 123-4567"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Relevant Experience
-              </label>
-              <textarea
-                value={formData.experience}
-                onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none resize-none"
-                rows={3}
-                placeholder="Any experience with animal rescue, nonprofits, community organizing, or just being a pet owner..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Why Are You Interested? *
-              </label>
-              <textarea
-                required
-                value={formData.whyInterested}
-                onChange={(e) => setFormData({ ...formData, whyInterested: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none resize-none"
-                rows={3}
-                placeholder="What draws you to this? What would you want to accomplish?"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Availability
-              </label>
-              <input
+              <FormField
+                label="Your Name"
+                name="name"
                 type="text"
-                value={formData.availability}
-                onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                placeholder="e.g., Evenings and weekends, 5 hours/week"
+                value={form.values.name}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("name")}
+                touched={form.isFieldTouched("name")}
+                placeholder="Jane Doe"
+                required
+              />
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={form.values.email}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("email")}
+                touched={form.isFieldTouched("email")}
+                placeholder="jane@example.com"
+                required
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white font-bold text-lg rounded-xl transition-colors"
+            <div className="grid md:grid-cols-2 gap-4">
+              <FormField
+                label="City You'd Lead"
+                name="city"
+                type="text"
+                value={form.values.city}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("city")}
+                touched={form.isFieldTouched("city")}
+                placeholder="e.g., Denver, CO"
+                required
+              />
+              <FormField
+                label="Phone"
+                name="phone"
+                type="tel"
+                value={form.values.phone || ""}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("phone")}
+                touched={form.isFieldTouched("phone")}
+                placeholder="(555) 123-4567"
+              />
+            </div>
+
+            <TextareaField
+              label="Relevant Experience"
+              name="experience"
+              value={form.values.experience || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("experience")}
+              touched={form.isFieldTouched("experience")}
+              rows={3}
+              placeholder="Any experience with animal rescue, nonprofits, community organizing, or just being a pet owner..."
+            />
+
+            <TextareaField
+              label="Why Are You Interested?"
+              name="whyInterested"
+              value={form.values.whyInterested}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("whyInterested")}
+              touched={form.isFieldTouched("whyInterested")}
+              rows={3}
+              placeholder="What draws you to this? What would you want to accomplish?"
+              required
+            />
+
+            <FormField
+              label="Availability"
+              name="availability"
+              type="text"
+              value={form.values.availability || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("availability")}
+              touched={form.isFieldTouched("availability")}
+              placeholder="e.g., Evenings and weekends, 5 hours/week"
+            />
+
+            <SubmitButton
+              isSubmitting={form.isSubmitting}
+              isValid={form.isValid}
+              loadingText="Submitting..."
             >
-              {isSubmitting ? "Submitting..." : "Submit Application"}
-            </button>
+              Submit Application
+            </SubmitButton>
           </form>
         </div>
 

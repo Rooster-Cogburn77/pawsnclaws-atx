@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useFormValidation } from "@/hooks";
+import { charlotteVolunteerSchema, type CharlotteVolunteerFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, SubmitButton } from "@/components/FormField";
 
 const volunteerRoles = [
   { id: "colony-care", label: "Colony Caretaker", description: "Feed and monitor a local colony" },
@@ -11,36 +14,74 @@ const volunteerRoles = [
   { id: "admin", label: "Admin & Social Media", description: "Help with communications" },
 ];
 
-export default function CharlotteVolunteerPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    zip: "",
-    roles: [] as string[],
-    experience: "",
-    availability: "",
-    message: "",
-  });
-  const [submitted, setSubmitted] = useState(false);
+const experienceOptions = [
+  { value: "", label: "Select..." },
+  { value: "none", label: "No experience (that's okay!)" },
+  { value: "pet-owner", label: "Pet owner" },
+  { value: "some", label: "Some rescue/shelter experience" },
+  { value: "experienced", label: "Experienced in animal rescue" },
+  { value: "professional", label: "Vet tech or professional" },
+];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // In production: submit to API
-    console.log("Charlotte volunteer submission:", formData);
-    setSubmitted(true);
-  };
+const availabilityOptions = [
+  { value: "", label: "Select..." },
+  { value: "weekdays", label: "Weekdays" },
+  { value: "weekends", label: "Weekends" },
+  { value: "evenings", label: "Evenings only" },
+  { value: "flexible", label: "Flexible schedule" },
+  { value: "occasional", label: "Occasional/events only" },
+];
+
+const defaultValues: CharlotteVolunteerFormData = {
+  name: "",
+  email: "",
+  phone: "",
+  zip: "",
+  roles: [],
+  experience: "",
+  availability: "",
+  message: "",
+};
+
+export default function CharlotteVolunteerPage() {
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+
+  const form = useFormValidation({
+    schema: charlotteVolunteerSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
+      const response = await fetch("/api/volunteer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          roles: selectedRoles,
+          city: "charlotte",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit application");
+      }
+    },
+  });
 
   const toggleRole = (roleId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      roles: prev.roles.includes(roleId)
-        ? prev.roles.filter((r) => r !== roleId)
-        : [...prev.roles, roleId],
-    }));
+    setSelectedRoles((prev) =>
+      prev.includes(roleId)
+        ? prev.filter((r) => r !== roleId)
+        : [...prev, roleId]
+    );
+    // Also update form values for validation
+    form.setValue("roles", selectedRoles.includes(roleId)
+      ? selectedRoles.filter((r) => r !== roleId)
+      : [...selectedRoles, roleId]
+    );
   };
 
-  if (submitted) {
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white py-16">
         <div className="max-w-xl mx-auto px-4 text-center">
@@ -72,63 +113,63 @@ export default function CharlotteVolunteerPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
+        <form onSubmit={form.handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
+          {form.submitError && (
+            <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+          )}
+
           {/* Basic Info */}
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                ZIP Code *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.zip}
-                onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
-                placeholder="28XXX"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-              />
-            </div>
+            <FormField
+              label="Full Name"
+              name="name"
+              type="text"
+              value={form.values.name}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("name")}
+              touched={form.isFieldTouched("name")}
+              required
+            />
+            <FormField
+              label="Email"
+              name="email"
+              type="email"
+              value={form.values.email}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("email")}
+              touched={form.isFieldTouched("email")}
+              required
+            />
+            <FormField
+              label="Phone"
+              name="phone"
+              type="tel"
+              value={form.values.phone || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("phone")}
+              touched={form.isFieldTouched("phone")}
+            />
+            <FormField
+              label="ZIP Code"
+              name="zip"
+              type="text"
+              value={form.values.zip}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("zip")}
+              touched={form.isFieldTouched("zip")}
+              placeholder="28XXX"
+              required
+            />
           </div>
 
           {/* Roles */}
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-4">
-              I&apos;m interested in: (select all that apply)
+              I&apos;m interested in: (select all that apply) *
             </label>
             <div className="grid sm:grid-cols-2 gap-3">
               {volunteerRoles.map((role) => (
@@ -137,7 +178,7 @@ export default function CharlotteVolunteerPage() {
                   type="button"
                   onClick={() => toggleRole(role.id)}
                   className={`p-4 rounded-lg border-2 text-left transition-all ${
-                    formData.roles.includes(role.id)
+                    selectedRoles.includes(role.id)
                       ? "border-teal-600 bg-teal-50"
                       : "border-gray-200 hover:border-teal-300"
                   }`}
@@ -147,67 +188,63 @@ export default function CharlotteVolunteerPage() {
                 </button>
               ))}
             </div>
+            {form.isFieldTouched("roles") && form.getFieldError("roles") && (
+              <p className="mt-2 text-sm text-red-600">{form.getFieldError("roles")}</p>
+            )}
           </div>
 
           {/* Experience */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Experience with cats/animals
-            </label>
-            <select
-              value={formData.experience}
-              onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-            >
-              <option value="">Select...</option>
-              <option value="none">No experience (that&apos;s okay!)</option>
-              <option value="pet-owner">Pet owner</option>
-              <option value="some">Some rescue/shelter experience</option>
-              <option value="experienced">Experienced in animal rescue</option>
-              <option value="professional">Vet tech or professional</option>
-            </select>
+            <SelectField
+              label="Experience with cats/animals"
+              name="experience"
+              value={form.values.experience || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("experience")}
+              touched={form.isFieldTouched("experience")}
+              options={experienceOptions}
+            />
           </div>
 
           {/* Availability */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Availability
-            </label>
-            <select
-              value={formData.availability}
-              onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-            >
-              <option value="">Select...</option>
-              <option value="weekdays">Weekdays</option>
-              <option value="weekends">Weekends</option>
-              <option value="evenings">Evenings only</option>
-              <option value="flexible">Flexible schedule</option>
-              <option value="occasional">Occasional/events only</option>
-            </select>
+            <SelectField
+              label="Availability"
+              name="availability"
+              value={form.values.availability || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("availability")}
+              touched={form.isFieldTouched("availability")}
+              options={availabilityOptions}
+            />
           </div>
 
           {/* Message */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Anything else you&apos;d like us to know?
-            </label>
-            <textarea
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            <TextareaField
+              label="Anything else you'd like us to know?"
+              name="message"
+              value={form.values.message || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("message")}
+              touched={form.isFieldTouched("message")}
               rows={4}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none resize-none"
               placeholder="Tell us about yourself, your experience, or any questions..."
             />
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-4 bg-teal-600 text-white text-lg font-bold rounded-xl hover:bg-teal-700 transition-colors"
+          <SubmitButton
+            isSubmitting={form.isSubmitting}
+            isValid={form.isValid && selectedRoles.length > 0}
+            loadingText="Submitting..."
+            className="w-full py-4 bg-teal-600 text-white text-lg font-bold rounded-xl hover:bg-teal-700 transition-colors disabled:bg-gray-300"
           >
             Submit Application
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </div>

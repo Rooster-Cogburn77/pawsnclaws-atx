@@ -315,16 +315,9 @@ export type SponsorInquiryFormData = z.infer<typeof sponsorInquirySchema>;
 // ============================================
 
 export const eventSignupSchema = z.object({
-  eventId: z.string().min(1, "Event ID is required"),
-  eventName: z.string().min(1, "Event name is required"),
   name: nameSchema,
   email: emailSchema,
   phone: phoneOptionalSchema,
-  guests: z
-    .number({ error: "Please enter number of guests" })
-    .min(1, "At least 1 guest required")
-    .max(10, "Maximum 10 guests per registration"),
-  notes: z.string().optional(),
 });
 
 export type EventSignupFormData = z.infer<typeof eventSignupSchema>;
@@ -334,6 +327,7 @@ export type EventSignupFormData = z.infer<typeof eventSignupSchema>;
 // ============================================
 
 export const cityRequestSchema = z.object({
+  name: nameSchema,
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
   email: emailSchema,
@@ -345,22 +339,145 @@ export const cityRequestSchema = z.object({
 export type CityRequestFormData = z.infer<typeof cityRequestSchema>;
 
 // ============================================
+// ROUND-UP PARTNER INQUIRY
+// ============================================
+
+export const roundupPartnerSchema = z.object({
+  businessName: z.string().min(1, "Business name is required"),
+  contactName: nameSchema,
+  email: emailSchema,
+  phone: phoneOptionalSchema,
+  businessType: z.string().optional(),
+  locations: z.string().optional(),
+  posSystem: z.string().optional(),
+  message: z.string().optional(),
+});
+
+export type RoundupPartnerFormData = z.infer<typeof roundupPartnerSchema>;
+
+// ============================================
 // CITY LEAD APPLICATION
 // ============================================
 
 export const cityLeadSchema = z.object({
   name: nameSchema,
   email: emailSchema,
-  phone: phoneSchema,
+  phone: phoneOptionalSchema,
   city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  experience: messageSchema,
-  availability: z.string().min(1, "Please describe your availability"),
-  motivation: messageSchema,
-  linkedIn: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  experience: z.string().optional(),
+  whyInterested: z.string().min(10, "Please tell us why you're interested"),
+  availability: z.string().optional(),
 });
 
 export type CityLeadFormData = z.infer<typeof cityLeadSchema>;
+
+// ============================================
+// CHARLOTTE-SPECIFIC SCHEMAS
+// ============================================
+
+// Charlotte volunteer form has zip code instead of general availability
+export const charlotteVolunteerSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  phone: phoneOptionalSchema,
+  zip: z.string().min(5, "ZIP code is required"),
+  roles: z.array(z.string()).min(1, "Please select at least one role"),
+  experience: z.string().optional(),
+  availability: z.string().optional(),
+  message: z.string().optional(),
+});
+
+export type CharlotteVolunteerFormData = z.infer<typeof charlotteVolunteerSchema>;
+
+// Charlotte foster form
+export const charlotteFosterSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  phone: phoneSchema,
+  zip: z.string().min(5, "ZIP code is required"),
+  housingType: z.string().min(1, "Please select housing type"),
+  hasOtherPets: z.string().min(1, "Please select an option"),
+  fosterType: z.array(z.string()).min(1, "Please select at least one foster type"),
+  experience: z.string().optional(),
+  message: z.string().optional(),
+});
+
+export type CharlotteFosterFormData = z.infer<typeof charlotteFosterSchema>;
+
+// Charlotte contact form (simpler than main contact)
+export const charlotteContactSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  subject: z.string().min(1, "Please select a subject"),
+  message: messageSchema,
+});
+
+export type CharlotteContactFormData = z.infer<typeof charlotteContactSchema>;
+
+// Charlotte surrender prevention
+export const charlotteSurrenderSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  phone: phoneOptionalSchema,
+  petType: z.string().min(1, "Please select pet type"),
+  petName: z.string().optional(),
+  reasons: z.array(z.string()).min(1, "Please select at least one reason"),
+  timeline: z.string().optional(),
+  message: z.string().optional(),
+});
+
+export type CharlotteSurrenderFormData = z.infer<typeof charlotteSurrenderSchema>;
+
+// Charlotte vet fund
+export const charlotteVetFundSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  phone: phoneSchema,
+  petName: z.string().min(1, "Pet name is required"),
+  petType: z.string().min(1, "Please select pet type"),
+  situation: messageSchema,
+  vetName: z.string().optional(),
+  vetPhone: z.string().optional(),
+  estimatedCost: z.string().min(1, "Estimated cost is required"),
+  canContribute: z.string().optional(),
+  message: z.string().optional(),
+});
+
+export type CharlotteVetFundFormData = z.infer<typeof charlotteVetFundSchema>;
+
+// Charlotte deposit assistance
+export const charlotteDepositSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  phone: phoneSchema,
+  moveDate: z.string().min(1, "Move date is required"),
+  currentAddress: z.string().optional(),
+  newAddress: z.string().optional(),
+  petType: z.string().min(1, "Please select pet type"),
+  petCount: z.string().min(1, "Number of pets is required"),
+  depositAmount: z.string().min(1, "Deposit amount is required"),
+  situation: z.string().optional(),
+});
+
+export type CharlotteDepositFormData = z.infer<typeof charlotteDepositSchema>;
+
+// Charlotte colony submission (uses similar structure to main)
+export const charlotteColonySchema = z.object({
+  colonyName: z.string().optional(),
+  locationDescription: z.string().min(1, "Location description is required"),
+  address: z.string().optional(),
+  estimatedCats: z.string().min(1, "Number of cats is required"),
+  tnrStatus: z.string().min(1, "Please select TNR status"),
+  hasCaretaker: z.string().min(1, "Please select an option"),
+  urgentNeeds: z.array(z.string()).optional(),
+  additionalInfo: z.string().optional(),
+  submitterName: nameSchema,
+  submitterEmail: emailSchema,
+  submitterPhone: phoneOptionalSchema,
+  submitterRelation: z.string().min(1, "Please select your relationship"),
+});
+
+export type CharlotteColonyFormData = z.infer<typeof charlotteColonySchema>;
 
 // ============================================
 // VALIDATION HELPER FUNCTIONS

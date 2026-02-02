@@ -1,49 +1,45 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { cityRequestSchema, type CityRequestFormData } from "@/lib/validations";
+import { FormField, TextareaField, FormError, SubmitButton } from "@/components/FormField";
+
+const defaultValues: CityRequestFormData = {
+  name: "",
+  city: "",
+  state: "",
+  email: "",
+  interest: "just-interested",
+  message: "",
+};
 
 export default function RequestCityPage() {
-  const [formData, setFormData] = useState({
-    city: "",
-    state: "",
-    name: "",
-    email: "",
-    interest: "just-interested", // just-interested | want-to-lead | know-someone
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
+  const form = useFormValidation({
+    schema: cityRequestSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          subject: `City Request: ${formData.city}, ${formData.state}`,
-          message: `City Request\n\nCity: ${formData.city}, ${formData.state}\nInterest Level: ${formData.interest}\n\nMessage: ${formData.message || "No additional message"}`,
+          name: data.name,
+          email: data.email,
+          subject: `City Request: ${data.city}, ${data.state}`,
+          message: `City Request\n\nCity: ${data.city}, ${data.state}\nInterest Level: ${data.interest}\n\nMessage: ${data.message || "No additional message"}`,
           type: "city-request",
         }),
       });
 
-      if (response.ok) {
-        setIsSubmitted(true);
-      }
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      const result = await response.json();
 
-  if (isSubmitted) {
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit request");
+      }
+    },
+  });
+
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-16 px-4">
         <div className="max-w-2xl mx-auto text-center">
@@ -52,7 +48,7 @@ export default function RequestCityPage() {
             Request Received!
           </h1>
           <p className="text-lg text-gray-600 mb-4">
-            Thanks for letting us know about <strong>{formData.city}, {formData.state}</strong>.
+            Thanks for letting us know about <strong>{form.values.city}, {form.values.state}</strong>.
             We&apos;ll keep you posted on expansion plans.
           </p>
           <p className="text-gray-500 mb-8">
@@ -113,63 +109,63 @@ export default function RequestCityPage() {
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={form.handleSubmit} className="space-y-6">
+            {form.submitError && (
+              <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+            )}
+
             <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="Denver"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="CO"
-                />
-              </div>
+              <FormField
+                label="City"
+                name="city"
+                type="text"
+                value={form.values.city}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("city")}
+                touched={form.isFieldTouched("city")}
+                placeholder="Denver"
+                required
+              />
+              <FormField
+                label="State"
+                name="state"
+                type="text"
+                value={form.values.state}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("state")}
+                touched={form.isFieldTouched("state")}
+                placeholder="CO"
+                required
+              />
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="Jane Doe"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none"
-                  placeholder="jane@example.com"
-                />
-              </div>
+              <FormField
+                label="Your Name"
+                name="name"
+                type="text"
+                value={form.values.name}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("name")}
+                touched={form.isFieldTouched("name")}
+                placeholder="Jane Doe"
+                required
+              />
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={form.values.email}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("email")}
+                touched={form.isFieldTouched("email")}
+                placeholder="jane@example.com"
+                required
+              />
             </div>
 
             <div>
@@ -182,8 +178,8 @@ export default function RequestCityPage() {
                     type="radio"
                     name="interest"
                     value="just-interested"
-                    checked={formData.interest === "just-interested"}
-                    onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+                    checked={form.values.interest === "just-interested"}
+                    onChange={() => form.setValue("interest", "just-interested")}
                     className="w-4 h-4 text-amber-500"
                   />
                   <div>
@@ -196,8 +192,8 @@ export default function RequestCityPage() {
                     type="radio"
                     name="interest"
                     value="want-to-lead"
-                    checked={formData.interest === "want-to-lead"}
-                    onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+                    checked={form.values.interest === "want-to-lead"}
+                    onChange={() => form.setValue("interest", "want-to-lead")}
                     className="w-4 h-4 text-amber-500"
                   />
                   <div>
@@ -210,8 +206,8 @@ export default function RequestCityPage() {
                     type="radio"
                     name="interest"
                     value="know-someone"
-                    checked={formData.interest === "know-someone"}
-                    onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+                    checked={form.values.interest === "know-someone"}
+                    onChange={() => form.setValue("interest", "know-someone")}
                     className="w-4 h-4 text-amber-500"
                   />
                   <div>
@@ -222,26 +218,25 @@ export default function RequestCityPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Anything else? (optional)
-              </label>
-              <textarea
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-amber-500 focus:outline-none resize-none"
-                rows={3}
-                placeholder="Know of great local resources? Have ideas for the city chapter?"
-              />
-            </div>
+            <TextareaField
+              label="Anything else?"
+              name="message"
+              value={form.values.message || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("message")}
+              touched={form.isFieldTouched("message")}
+              rows={3}
+              placeholder="Know of great local resources? Have ideas for the city chapter?"
+            />
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 text-white font-bold text-lg rounded-xl transition-colors"
+            <SubmitButton
+              isSubmitting={form.isSubmitting}
+              isValid={form.isValid}
+              loadingText="Submitting..."
             >
-              {isSubmitting ? "Submitting..." : "Submit City Request"}
-            </button>
+              Submit City Request
+            </SubmitButton>
           </form>
         </div>
 

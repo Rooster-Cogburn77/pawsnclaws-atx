@@ -1,30 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useFormValidation } from "@/hooks";
+import { charlotteDepositSchema, type CharlotteDepositFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, SubmitButton } from "@/components/FormField";
+
+const petTypeOptions = [
+  { value: "", label: "Select..." },
+  { value: "cat", label: "Cat(s)" },
+  { value: "dog", label: "Dog(s)" },
+  { value: "both", label: "Cats and Dogs" },
+];
+
+const defaultValues: CharlotteDepositFormData = {
+  name: "",
+  email: "",
+  phone: "",
+  moveDate: "",
+  currentAddress: "",
+  newAddress: "",
+  petType: "",
+  petCount: "",
+  depositAmount: "",
+  situation: "",
+};
 
 export default function CharlotteDepositAssistancePage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    currentAddress: "",
-    newAddress: "",
-    moveDate: "",
-    petType: "",
-    petCount: "",
-    depositAmount: "",
-    monthlyIncome: "",
-    situation: "",
+  const form = useFormValidation({
+    schema: charlotteDepositSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
+      const response = await fetch("/api/help/deposit-assistance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          city: "charlotte",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to submit application");
+      }
+    },
   });
-  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Charlotte deposit assistance:", formData);
-    setSubmitted(true);
-  };
-
-  if (submitted) {
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-16">
         <div className="max-w-xl mx-auto px-4 text-center">
@@ -71,152 +93,149 @@ export default function CharlotteDepositAssistancePage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
+        <form onSubmit={form.handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Apply for Assistance</h2>
+
+          {form.submitError && (
+            <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+          )}
 
           {/* Contact */}
           <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone *
-              </label>
-              <input
-                type="tel"
-                required
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Move Date *
-              </label>
-              <input
-                type="date"
-                required
-                value={formData.moveDate}
-                onChange={(e) => setFormData({ ...formData, moveDate: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-            </div>
+            <FormField
+              label="Full Name"
+              name="name"
+              type="text"
+              value={form.values.name}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("name")}
+              touched={form.isFieldTouched("name")}
+              required
+            />
+            <FormField
+              label="Email"
+              name="email"
+              type="email"
+              value={form.values.email}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("email")}
+              touched={form.isFieldTouched("email")}
+              required
+            />
+            <FormField
+              label="Phone"
+              name="phone"
+              type="tel"
+              value={form.values.phone}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("phone")}
+              touched={form.isFieldTouched("phone")}
+              required
+            />
+            <FormField
+              label="Move Date"
+              name="moveDate"
+              type="date"
+              value={form.values.moveDate}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("moveDate")}
+              touched={form.isFieldTouched("moveDate")}
+              required
+            />
           </div>
 
           {/* Addresses */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Current Address
-            </label>
-            <input
+            <FormField
+              label="Current Address"
+              name="currentAddress"
               type="text"
-              value={formData.currentAddress}
-              onChange={(e) => setFormData({ ...formData, currentAddress: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+              value={form.values.currentAddress || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("currentAddress")}
+              touched={form.isFieldTouched("currentAddress")}
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              New Address (if known)
-            </label>
-            <input
+            <FormField
+              label="New Address (if known)"
+              name="newAddress"
               type="text"
-              value={formData.newAddress}
-              onChange={(e) => setFormData({ ...formData, newAddress: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+              value={form.values.newAddress || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("newAddress")}
+              touched={form.isFieldTouched("newAddress")}
             />
           </div>
 
           {/* Pet & Deposit */}
           <div className="grid md:grid-cols-3 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Pet Type *
-              </label>
-              <select
-                required
-                value={formData.petType}
-                onChange={(e) => setFormData({ ...formData, petType: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              >
-                <option value="">Select...</option>
-                <option value="cat">Cat(s)</option>
-                <option value="dog">Dog(s)</option>
-                <option value="both">Cats and Dogs</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Number of Pets *
-              </label>
-              <input
-                type="number"
-                required
-                min="1"
-                value={formData.petCount}
-                onChange={(e) => setFormData({ ...formData, petCount: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Deposit Amount *
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.depositAmount}
-                onChange={(e) => setFormData({ ...formData, depositAmount: e.target.value })}
-                placeholder="$"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-            </div>
+            <SelectField
+              label="Pet Type"
+              name="petType"
+              value={form.values.petType}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("petType")}
+              touched={form.isFieldTouched("petType")}
+              options={petTypeOptions}
+              required
+            />
+            <FormField
+              label="Number of Pets"
+              name="petCount"
+              type="number"
+              value={form.values.petCount}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("petCount")}
+              touched={form.isFieldTouched("petCount")}
+              required
+            />
+            <FormField
+              label="Deposit Amount"
+              name="depositAmount"
+              type="text"
+              value={form.values.depositAmount}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("depositAmount")}
+              touched={form.isFieldTouched("depositAmount")}
+              placeholder="$"
+              required
+            />
           </div>
 
           {/* Situation */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tell us about your situation
-            </label>
-            <textarea
-              value={formData.situation}
-              onChange={(e) => setFormData({ ...formData, situation: e.target.value })}
+            <TextareaField
+              label="Tell us about your situation"
+              name="situation"
+              value={form.values.situation || ""}
+              onChange={form.handleChange}
+              onBlur={form.handleBlur}
+              error={form.getFieldError("situation")}
+              touched={form.isFieldTouched("situation")}
               rows={4}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none resize-none"
               placeholder="Why do you need help with the deposit? Any other relevant details..."
             />
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-4 bg-blue-600 text-white text-lg font-bold rounded-xl hover:bg-blue-700 transition-colors"
+          <SubmitButton
+            isSubmitting={form.isSubmitting}
+            isValid={form.isValid}
+            loadingText="Submitting..."
+            className="w-full py-4 bg-blue-600 text-white text-lg font-bold rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300"
           >
             Submit Application
-          </button>
+          </SubmitButton>
 
           <p className="text-center text-sm text-gray-500 mt-4">
             We&apos;ll review your application within 3-5 business days.

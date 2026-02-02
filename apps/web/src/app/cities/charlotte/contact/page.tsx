@@ -1,23 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useFormValidation } from "@/hooks";
+import { charlotteContactSchema, type CharlotteContactFormData } from "@/lib/validations";
+import { FormField, TextareaField, SelectField, FormError, SubmitButton } from "@/components/FormField";
+
+const subjectOptions = [
+  { value: "", label: "Select a topic..." },
+  { value: "general", label: "General Question" },
+  { value: "colony", label: "Colony/TNR Help" },
+  { value: "volunteer", label: "Volunteering" },
+  { value: "foster", label: "Fostering" },
+  { value: "donate", label: "Donations" },
+  { value: "partnership", label: "Partnership Inquiry" },
+  { value: "other", label: "Other" },
+];
+
+const defaultValues: CharlotteContactFormData = {
+  name: "",
+  email: "",
+  subject: "",
+  message: "",
+};
 
 export default function CharlotteContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
+  const form = useFormValidation({
+    schema: charlotteContactSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          city: "charlotte",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to send message");
+      }
+    },
   });
-  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Charlotte contact form:", formData);
-    setSubmitted(true);
-  };
-
-  if (submitted) {
+  if (form.submitSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white py-16">
         <div className="max-w-xl mx-auto px-4 text-center">
@@ -51,70 +78,64 @@ export default function CharlotteContactPage() {
           {/* Contact Form */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Send a Message</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subject *
-                </label>
-                <select
-                  required
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none"
-                >
-                  <option value="">Select a topic...</option>
-                  <option value="general">General Question</option>
-                  <option value="colony">Colony/TNR Help</option>
-                  <option value="volunteer">Volunteering</option>
-                  <option value="foster">Fostering</option>
-                  <option value="donate">Donations</option>
-                  <option value="partnership">Partnership Inquiry</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  required
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  rows={5}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-teal-500 focus:outline-none resize-none"
-                  placeholder="How can we help?"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full py-3 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors"
+            <form onSubmit={form.handleSubmit} className="space-y-6">
+              {form.submitError && (
+                <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
+              )}
+
+              <FormField
+                label="Your Name"
+                name="name"
+                type="text"
+                value={form.values.name}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("name")}
+                touched={form.isFieldTouched("name")}
+                required
+              />
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={form.values.email}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("email")}
+                touched={form.isFieldTouched("email")}
+                required
+              />
+              <SelectField
+                label="Subject"
+                name="subject"
+                value={form.values.subject}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("subject")}
+                touched={form.isFieldTouched("subject")}
+                options={subjectOptions}
+                required
+              />
+              <TextareaField
+                label="Message"
+                name="message"
+                value={form.values.message}
+                onChange={form.handleChange}
+                onBlur={form.handleBlur}
+                error={form.getFieldError("message")}
+                touched={form.isFieldTouched("message")}
+                rows={5}
+                placeholder="How can we help?"
+                required
+              />
+              <SubmitButton
+                isSubmitting={form.isSubmitting}
+                isValid={form.isValid}
+                loadingText="Sending..."
+                className="w-full py-3 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors disabled:bg-gray-300"
               >
                 Send Message
-              </button>
+              </SubmitButton>
             </form>
           </div>
 

@@ -328,6 +328,7 @@ interface SubmitButtonProps {
   isValid?: boolean;
   children: React.ReactNode;
   loadingText?: string;
+  className?: string;
 }
 
 export function SubmitButton({
@@ -335,12 +336,13 @@ export function SubmitButton({
   isValid = true,
   children,
   loadingText = "Submitting...",
+  className,
 }: SubmitButtonProps) {
   return (
     <button
       type="submit"
       disabled={isSubmitting || !isValid}
-      className="w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-lg rounded-xl transition-colors"
+      className={className || "w-full py-4 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-lg rounded-xl transition-colors"}
     >
       {isSubmitting ? (
         <span className="flex items-center justify-center gap-2">

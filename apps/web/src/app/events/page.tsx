@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useFormValidation } from "@/hooks";
+import { eventSignupSchema, type EventSignupFormData } from "@/lib/validations";
+import { FormField, FormError } from "@/components/FormField";
 
 interface Event {
   id: string;
@@ -81,16 +84,19 @@ const eventTypeColors: Record<string, string> = {
 
 export default function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("");
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedEvent) return;
+  const defaultValues: EventSignupFormData = {
+    name: "",
+    email: "",
+    phone: "",
+  };
 
-    setStatus("loading");
-    try {
+  const form = useFormValidation({
+    schema: eventSignupSchema,
+    initialValues: defaultValues,
+    onSubmit: async (data) => {
+      if (!selectedEvent) return;
+
       const response = await fetch("/api/events/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -103,30 +109,21 @@ export default function EventsPage() {
             day: "numeric",
             year: "numeric",
           }) + " at " + selectedEvent.time,
-          ...formData,
+          ...data,
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (response.ok) {
-        setStatus("success");
-        setMessage(data.message || "You're signed up!");
-      } else {
-        setStatus("error");
-        setMessage(data.error || "Something went wrong");
+      if (!response.ok) {
+        throw new Error(result.error || "Something went wrong");
       }
-    } catch {
-      setStatus("error");
-      setMessage("Network error. Please try again.");
-    }
-  };
+    },
+  });
 
   const closeModal = () => {
     setSelectedEvent(null);
-    setFormData({ name: "", email: "", phone: "" });
-    setStatus("idle");
-    setMessage("");
+    form.reset();
   };
 
   return (
@@ -310,10 +307,10 @@ export default function EventsPage() {
                 </div>
               </div>
 
-              {status === "success" ? (
+              {form.submitSuccess ? (
                 <div className="text-center py-6">
                   <span className="text-4xl block mb-4">✓</span>
-                  <p className="text-green-700 font-medium mb-2">{message}</p>
+                  <p className="text-green-700 font-medium mb-2">You&apos;re signed up!</p>
                   <p className="text-sm text-gray-500 mb-4">
                     Check your email for confirmation details.
                   </p>
@@ -325,55 +322,50 @@ export default function EventsPage() {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone (optional)
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  {status === "error" && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                      {message}
-                    </div>
+                <form onSubmit={form.handleSubmit} className="space-y-4">
+                  {form.submitError && (
+                    <FormError error={form.submitError} onDismiss={form.clearSubmitError} />
                   )}
+
+                  <FormField
+                    label="Name"
+                    name="name"
+                    type="text"
+                    value={form.values.name}
+                    onChange={form.handleChange}
+                    onBlur={form.handleBlur}
+                    error={form.getFieldError("name")}
+                    touched={form.isFieldTouched("name")}
+                    required
+                  />
+                  <FormField
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={form.values.email}
+                    onChange={form.handleChange}
+                    onBlur={form.handleBlur}
+                    error={form.getFieldError("email")}
+                    touched={form.isFieldTouched("email")}
+                    required
+                  />
+                  <FormField
+                    label="Phone"
+                    name="phone"
+                    type="tel"
+                    value={form.values.phone || ""}
+                    onChange={form.handleChange}
+                    onBlur={form.handleBlur}
+                    error={form.getFieldError("phone")}
+                    touched={form.isFieldTouched("phone")}
+                  />
 
                   <button
                     type="submit"
-                    disabled={status === "loading"}
+                    disabled={form.isSubmitting || !form.isValid}
                     className="w-full py-3 bg-amber-500 text-white font-bold rounded-lg hover:bg-amber-600 transition-colors disabled:opacity-50"
                   >
-                    {status === "loading" ? "Signing up..." : "Confirm Signup"}
+                    {form.isSubmitting ? "Signing up..." : "Confirm Signup"}
                   </button>
                 </form>
               )}
