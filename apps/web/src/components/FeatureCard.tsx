@@ -28,7 +28,7 @@ export function FeatureCard({
       role="link"
       tabIndex={0}
       onClick={handleClick}
-      onKeyDown={(e) => e.key === "Enter" && handleClick(e as unknown as React.MouseEvent)}
+      onKeyDown={(e) => e.key === "Enter" && handleClick()}
       className="group p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all block cursor-pointer"
     >
       <div className="text-4xl mb-4">{emoji}</div>
