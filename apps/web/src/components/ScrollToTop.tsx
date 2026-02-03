@@ -4,31 +4,26 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 /**
- * Scrolls to top on route change.
+ * Scrolls to top on initial load and route change.
  */
 export function ScrollToTop() {
   const pathname = usePathname();
 
+  // On initial mount - disable scroll restoration
   useEffect(() => {
-    // Disable browser scroll restoration
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
-
-    // Scroll immediately
+    // Force scroll on initial load
     window.scrollTo(0, 0);
+  }, []);
 
-    // Scroll after paint
+  // On route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
     requestAnimationFrame(() => {
       window.scrollTo(0, 0);
     });
-
-    // Scroll after a short delay (catch any layout shifts)
-    const timer = setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 100);
-
-    return () => clearTimeout(timer);
   }, [pathname]);
 
   return null;
