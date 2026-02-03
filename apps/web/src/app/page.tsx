@@ -316,6 +316,7 @@ function FeatureCard({
   return (
     <Link
       href={href}
+      scroll={true}
       className="group p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all"
     >
       <div className="text-4xl mb-4">{emoji}</div>
