@@ -1,19 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-
-// Force scroll to top on page load
-function useScrollToTop() {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    const t1 = setTimeout(() => window.scrollTo(0, 0), 0);
-    const t2 = setTimeout(() => window.scrollTo(0, 0), 50);
-    const t3 = setTimeout(() => window.scrollTo(0, 0), 100);
-    const t4 = setTimeout(() => window.scrollTo(0, 0), 200);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
-  }, []);
-}
 import { useFormValidation } from "@/hooks";
 import { vetFundSchema, type VetFundFormData } from "@/lib/validations";
 import { FormField, TextareaField, SelectField, CheckboxField, FormError, SubmitButton } from "@/components/FormField";
@@ -40,7 +28,6 @@ const defaultValues: VetFundFormData = {
 };
 
 export default function VetFundApplicationPage() {
-  useScrollToTop();
   const [step, setStep] = useState(1);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [proofOfIncome, setProofOfIncome] = useState(false);
