@@ -23,10 +23,12 @@ Running log of all Claude Code agent sessions. Most recent first.
   - /cities/charlotte page: Same pattern applied
 - Connected GitHub to Vercel for auto-deploy
   - Ran `npx vercel git connect` from apps/web
+  - Added vercel.json at repo root for monorepo build config
   - Pushes to master will now auto-deploy
 
 ### Files Created
 - apps/web/src/components/ScrollToTop.tsx
+- vercel.json (monorepo build config)
 
 ### Files Modified
 - apps/web/src/app/page.tsx (scroll={false} on Links, spacing)
