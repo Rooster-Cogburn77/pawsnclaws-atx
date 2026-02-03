@@ -16,8 +16,7 @@ export function FeatureCard({
 }) {
   const router = useRouter();
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleClick = () => {
     // Force scroll to absolute top
     window.scrollTo(0, 0);
     // Navigate with scroll disabled - we handle it ourselves
@@ -25,9 +24,11 @@ export function FeatureCard({
   };
 
   return (
-    <a
-      href={href}
+    <div
+      role="link"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => e.key === "Enter" && handleClick(e as unknown as React.MouseEvent)}
       className="group p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all block cursor-pointer"
     >
       <div className="text-4xl mb-4">{emoji}</div>
@@ -39,6 +40,6 @@ export function FeatureCard({
         Learn more
         <ArrowRightIcon className="w-4 h-4" />
       </div>
-    </a>
+    </div>
   );
 }
