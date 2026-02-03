@@ -4,6 +4,47 @@ Running log of all Claude Code agent sessions. Most recent first.
 
 ---
 
+## Session: 2026-02-02 (Scroll Fix + Design Tweaks)
+
+**Commit**: 5736ee0
+**Focus**: Fix scroll-to-top on navigation, tighten section spacing
+
+### Completed
+- Fixed pages not loading at top (65px offset issue)
+  - Root cause: Next.js Link scroll behavior + sticky header
+  - Added `scroll={false}` to FeatureCard Links
+  - Created ScrollToTop component for route changes
+  - Removed `scroll-behavior: smooth` from CSS
+- Discovered Vercel wasn't auto-deploying from GitHub
+  - Must use `npx vercel --prod` from apps/web to deploy
+- Tightened vertical spacing between sections
+  - Homepage: Hero `py-12 lg:py-16`, Stats `pt-8 pb-16`
+  - /cities page: Same pattern applied
+  - /cities/charlotte page: Same pattern applied
+
+### Files Created
+- apps/web/src/components/ScrollToTop.tsx
+
+### Files Modified
+- apps/web/src/app/page.tsx (scroll={false} on Links, spacing)
+- apps/web/src/app/layout.tsx (added ScrollToTop)
+- apps/web/src/app/globals.css (removed smooth scroll)
+- apps/web/src/app/cities/page.tsx (spacing)
+- apps/web/src/app/cities/charlotte/page.tsx (spacing)
+
+### Notes
+- Spent 2 hours debugging scroll issue before realizing Vercel wasn't deploying
+- "Redeploy" in Vercel dashboard just redeploys old build - use CLI for new code
+- The 65px offset was exactly the header height (64px + 1px border)
+- User feedback: "if i say bud, im pissed"
+
+### Next Steps
+1. Connect GitHub to Vercel for auto-deploy (Settings > Git)
+2. Continue design refinements as needed
+3. Test scroll behavior across all pages
+
+---
+
 ## Session: 2026-02-02 (Form Validation Migration)
 
 **Commit**: 97bb194
