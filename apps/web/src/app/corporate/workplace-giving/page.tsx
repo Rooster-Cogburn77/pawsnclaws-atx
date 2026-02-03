@@ -91,10 +91,10 @@ export default function WorkplaceGivingPage() {
       <section className="px-4 pb-12">
         <div className="max-w-2xl mx-auto">
           <div className="bg-purple-900 text-white rounded-2xl p-8 text-center">
-            <p className="text-purple-300 text-sm mb-2">Search for us using our EIN</p>
-            <p className="text-4xl font-mono font-bold tracking-wider mb-2">XX-XXXXXXX</p>
+            <p className="text-purple-300 text-sm mb-2">Our EIN (501(c)(3) status pending)</p>
+            <p className="text-4xl font-mono font-bold tracking-wider mb-2">41-4047996</p>
             <p className="text-purple-300 text-sm">
-              or search &quot;PawsNClaws ATX&quot;
+              or search &quot;Paws and Claws ATX&quot;
             </p>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function WorkplaceGivingPage() {
                     Search for PawsNClaws ATX
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Use our name &quot;PawsNClaws ATX&quot; or EIN: XX-XXXXXXX.
+                    Use our name &quot;Paws and Claws ATX&quot; or EIN: 41-4047996.
                     We&apos;re registered on most major platforms.
                   </p>
                 </div>

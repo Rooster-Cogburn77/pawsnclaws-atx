@@ -96,8 +96,8 @@ export default function CorporatePage() {
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-3xl font-bold text-amber-600">501(c)(3)</div>
-                <div className="text-sm text-gray-600">Tax Exempt Status</div>
+                <div className="text-3xl font-bold text-amber-600">Nonprofit</div>
+                <div className="text-sm text-gray-600">501(c)(3) Pending</div>
               </div>
               <div>
                 <div className="text-3xl font-bold text-amber-600">100%</div>
@@ -121,10 +121,9 @@ export default function CorporatePage() {
         <div className="max-w-3xl mx-auto">
           <div className="bg-slate-900 text-white rounded-2xl p-8 text-center">
             <p className="text-slate-400 text-sm mb-2">Federal Tax ID (EIN)</p>
-            <p className="text-3xl font-mono font-bold tracking-wider">XX-XXXXXXX</p>
+            <p className="text-3xl font-mono font-bold tracking-wider">41-4047996</p>
             <p className="text-slate-400 text-sm mt-4">
-              Use this when setting up workplace giving or matching gift programs.
-              <br />Contact us for official documentation.
+              501(c)(3) status pending. Contact us for updates on tax-exempt status.
             </p>
           </div>
         </div>

@@ -276,7 +276,7 @@ export default function MatchingGiftsPage() {
                   <ol className="text-sm text-gray-600 space-y-2">
                     <li>1. Make your donation to PawsNClaws ATX</li>
                     <li>2. Log into your company&apos;s giving platform ({selectedCompany.platform})</li>
-                    <li>3. Search for &quot;PawsNClaws ATX&quot; or use EIN: XX-XXXXXXX</li>
+                    <li>3. Search for &quot;PawsNClaws ATX&quot; or use EIN: 41-4047996</li>
                     <li>4. Submit your matching gift request</li>
                   </ol>
                 </div>
@@ -396,7 +396,7 @@ export default function MatchingGiftsPage() {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Tax ID (EIN)</span>
-                <span className="font-mono font-medium">XX-XXXXXXX</span>
+                <span className="font-mono font-medium">41-4047996</span>
               </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Tax Status</span>

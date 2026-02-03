@@ -51,8 +51,8 @@ const alternativeGiving = [
   {
     emoji: "🏦",
     title: "Donor Advised Fund (DAF)",
-    description: "Recommend a grant from your DAF. We're a registered 501(c)(3) nonprofit.",
-    details: "EIN: [Pending] - Search for 'PawsNClaws ATX' in your DAF portal.",
+    description: "Recommend a grant from your DAF once our 501(c)(3) status is approved.",
+    details: "501(c)(3) status pending - check back soon.",
   },
   {
     emoji: "📜",

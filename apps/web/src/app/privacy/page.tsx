@@ -32,7 +32,7 @@ export default function PrivacyPolicyPage() {
               use our services.
             </p>
             <p className="text-gray-700">
-              As a 501(c)(3) nonprofit organization, we are dedicated to transparency in how
+              As a nonprofit organization (501(c)(3) status pending), we are dedicated to transparency in how
               we handle your personal information.
             </p>
           </section>

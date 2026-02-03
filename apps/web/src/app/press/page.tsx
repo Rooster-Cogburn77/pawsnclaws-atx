@@ -23,8 +23,8 @@ export default function PressPage() {
         {/* Organization Info */}
         <div className="grid grid-cols-2 gap-4 mb-12">
           <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-            <div className="text-2xl font-bold text-amber-600">501(c)(3)</div>
-            <div className="text-xs text-gray-600">Tax Exempt Status</div>
+            <div className="text-2xl font-bold text-amber-600">Nonprofit</div>
+            <div className="text-xs text-gray-600">501(c)(3) Pending</div>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-4 text-center">
             <div className="text-2xl font-bold text-amber-600">Austin, TX</div>
@@ -54,7 +54,7 @@ export default function PressPage() {
               </h2>
               <div className="text-gray-600 text-sm space-y-3">
                 <p>
-                  PawsNClaws ATX is a 501(c)(3) nonprofit organization dedicated to keeping
+                  PawsNClaws ATX is a nonprofit organization (501(c)(3) status pending) dedicated to keeping
                   pets and their families together in Austin, Texas. We provide programs
                   that address the root causes of pet surrender and support the city&apos;s
                   no-kill initiatives.

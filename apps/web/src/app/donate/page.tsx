@@ -267,7 +267,7 @@ export default function DonatePage() {
                 </svg>
                 Secure
               </span>
-              <span>501(c)(3) Tax Deductible</span>
+              <span>501(c)(3) Status Pending</span>
               <span>Powered by Stripe</span>
             </div>
           </form>

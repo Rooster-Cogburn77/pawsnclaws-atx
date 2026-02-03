@@ -35,7 +35,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-3">About Our Organization</h2>
             <p className="text-gray-700">
-              PawsNClaws ATX is a 501(c)(3) nonprofit organization dedicated to keeping pets
+              PawsNClaws ATX is a nonprofit organization (501(c)(3) status pending) dedicated to keeping pets
               and people together in Austin, Texas. Our services include volunteer coordination,
               foster programs, financial assistance for pet-related needs, lost and found pet
               services, and community resources.

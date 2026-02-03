@@ -348,7 +348,7 @@ export default function TributePage() {
                 </svg>
                 Secure
               </span>
-              <span>501(c)(3) Tax Deductible</span>
+              <span>501(c)(3) Status Pending</span>
             </div>
           </form>
 

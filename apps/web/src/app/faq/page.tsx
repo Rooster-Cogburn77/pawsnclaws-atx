@@ -9,7 +9,7 @@ const faqs = [
     questions: [
       {
         q: "What is PawsNClaws ATX?",
-        a: "PawsNClaws ATX is a 501(c)(3) nonprofit organization dedicated to keeping pets and people together in Austin, Texas. We provide resources, financial assistance, and community support to help families keep their beloved pets.",
+        a: "PawsNClaws ATX is a nonprofit organization dedicated to keeping pets and people together in Austin, Texas. We provide resources, financial assistance, and community support to help families keep their beloved pets.",
       },
       {
         q: "Are you a shelter or rescue?",
@@ -85,7 +85,7 @@ const faqs = [
     questions: [
       {
         q: "Is my donation tax-deductible?",
-        a: "Yes! PawsNClaws ATX is a registered 501(c)(3) nonprofit. All donations are tax-deductible to the extent allowed by law. You'll receive a receipt for donations of $10 or more.",
+        a: "Our 501(c)(3) status is currently pending. Once approved, donations will be tax-deductible. You'll receive a receipt for all donations.",
       },
       {
         q: "How are donations used?",

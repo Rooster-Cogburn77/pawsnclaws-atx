@@ -292,7 +292,7 @@ export default function SponsorDeckPage() {
             <p className="text-gray-600 mb-1">partnerships@pawsnclaws.org</p>
             <p className="text-gray-600 mb-4">Austin, Texas</p>
             <p className="text-sm text-gray-500">
-              501(c)(3) Tax ID: XX-XXXXXXX
+              EIN: 41-4047996 (501(c)(3) status pending)
             </p>
           </div>
         </div>
