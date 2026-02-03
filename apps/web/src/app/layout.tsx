@@ -78,11 +78,6 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <script
-          dangerouslySetInnerHTML={{
-            __html: `if(history.scrollRestoration){history.scrollRestoration='manual'}window.scrollTo(0,0)`,
-          }}
-        />
-        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
@@ -98,7 +93,7 @@ export default function RootLayout({
         </a>
         <div className="flex min-h-screen flex-col">
           <Header />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">{children}</main>
           <Footer />
         </div>
       </body>
