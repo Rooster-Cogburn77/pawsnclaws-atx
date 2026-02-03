@@ -21,6 +21,9 @@ Running log of all Claude Code agent sessions. Most recent first.
   - Homepage: Hero `py-12 lg:py-16`, Stats `pt-8 pb-16`
   - /cities page: Same pattern applied
   - /cities/charlotte page: Same pattern applied
+- Connected GitHub to Vercel for auto-deploy
+  - Ran `npx vercel git connect` from apps/web
+  - Pushes to master will now auto-deploy
 
 ### Files Created
 - apps/web/src/components/ScrollToTop.tsx
@@ -39,7 +42,7 @@ Running log of all Claude Code agent sessions. Most recent first.
 - User feedback: "if i say bud, im pissed"
 
 ### Next Steps
-1. Connect GitHub to Vercel for auto-deploy (Settings > Git)
+1. Verify auto-deploy works on next push
 2. Continue design refinements as needed
 3. Test scroll behavior across all pages
 

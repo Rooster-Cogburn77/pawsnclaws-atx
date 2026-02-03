@@ -15,7 +15,7 @@
 | Design/Spacing | Complete | - | Tightened hero-to-stats spacing |
 | Form Validation | Complete | - | All forms migrated to useFormValidation |
 | Web | Clean | - | Build passes, lint clean |
-| Deployment | Manual | - | Vercel not auto-deploying, use CLI |
+| Deployment | Auto | - | GitHub connected to Vercel for auto-deploy |
 
 ---
 
@@ -23,7 +23,7 @@
 
 | Issue | Severity | Required Action |
 |-------|----------|-----------------|
-| Vercel auto-deploy | Medium | Connect GitHub repo in Vercel Settings > Git |
+| ~~Vercel auto-deploy~~ | Resolved | GitHub connected via CLI |
 | Supabase schema | Unknown | Verify schema applied to database |
 
 ---
@@ -74,7 +74,7 @@ git status && git log --oneline -5
 
 ## Notes for Next Agent
 
-- **IMPORTANT**: Vercel is NOT auto-deploying from GitHub. Must run `npx vercel --prod` from `apps/web` to deploy.
+- **Vercel auto-deploy enabled**: GitHub is connected. Pushes to master will auto-deploy.
 - Scroll-to-top fix uses `scroll={false}` on Links + ScrollToTop component
 - ScrollToTop.tsx in components handles scrolling to 0 on route change
 - Removed `scroll-behavior: smooth` from globals.css (was interfering with scroll)
