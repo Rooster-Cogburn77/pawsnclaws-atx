@@ -38,7 +38,7 @@ export default function CitiesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <section className="bg-gradient-to-r from-amber-500 to-orange-500 py-16">
+      <section className="bg-gradient-to-r from-amber-500 to-orange-500 py-12 lg:py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold text-white mb-4">
             PawsNClaws Cities
@@ -51,7 +51,7 @@ export default function CitiesPage() {
       </section>
 
       {/* Active Cities */}
-      <section className="py-16">
+      <section className="pt-8 pb-16">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Active Cities</h2>
 

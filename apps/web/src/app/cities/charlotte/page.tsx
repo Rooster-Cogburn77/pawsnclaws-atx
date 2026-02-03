@@ -10,7 +10,7 @@ export default function CharlottePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white">
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-4 py-16">
+      <section className="max-w-6xl mx-auto px-4 py-12 lg:py-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-5xl font-bold text-gray-900 mb-4">
@@ -48,7 +48,7 @@ export default function CharlottePage() {
       </section>
 
       {/* Quick Links */}
-      <section className="bg-white py-12">
+      <section className="bg-white pt-8 pb-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
             How Can We Help?
