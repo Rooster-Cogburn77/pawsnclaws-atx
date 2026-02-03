@@ -20,10 +20,8 @@ export function FeatureCard({
     e.preventDefault();
     // Force scroll to absolute top
     window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    // Navigate after scroll
-    router.push(href);
+    // Navigate with scroll disabled - we handle it ourselves
+    router.push(href, { scroll: false });
   };
 
   return (
