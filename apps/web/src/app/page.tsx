@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppLink } from "@/components/AppLink";
 import { siteConfig } from "@/data/site-config";
 import { ArrowRightIcon } from "@/components/Icons";
 
@@ -314,9 +315,8 @@ function FeatureCard({
   href: string;
 }) {
   return (
-    <Link
+    <AppLink
       href={href}
-      scroll={true}
       className="group p-6 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition-all"
     >
       <div className="text-4xl mb-4">{emoji}</div>
@@ -328,6 +328,6 @@ function FeatureCard({
         Learn more
         <ArrowRightIcon className="w-4 h-4" />
       </div>
-    </Link>
+    </AppLink>
   );
 }
