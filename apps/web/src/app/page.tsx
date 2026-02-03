@@ -7,7 +7,7 @@ export default function Home() {
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-amber-50 to-white">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
               {siteConfig.hero.title}
@@ -43,7 +43,7 @@ export default function Home() {
       </section>
 
       {/* Quick Stats */}
-      <section className="py-12 bg-white">
+      <section className="py-16 bg-white">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {siteConfig.facts.map((fact, i) => (
@@ -65,7 +65,7 @@ export default function Home() {
       </section>
 
       {/* Need Help Section */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-16 bg-gray-50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
             Need Help With Your Pet?
@@ -112,7 +112,7 @@ export default function Home() {
       </section>
 
       {/* Ways to Help */}
-      <section className="py-12 bg-white">
+      <section className="py-16 bg-white">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
             Ways to Help
@@ -162,7 +162,7 @@ export default function Home() {
       </section>
 
       {/* Corporate Partners Section */}
-      <section className="py-12 bg-gray-900">
+      <section className="py-16 bg-gray-900">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -230,7 +230,7 @@ export default function Home() {
       </section>
 
       {/* Community Partners */}
-      <section className="py-12 bg-white border-t">
+      <section className="py-16 bg-white border-t">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">
             Community Partners
