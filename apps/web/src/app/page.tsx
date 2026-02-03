@@ -7,7 +7,7 @@ export default function Home() {
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-amber-50 to-white">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
               {siteConfig.hero.title}
@@ -43,7 +43,7 @@ export default function Home() {
       </section>
 
       {/* Quick Stats */}
-      <section className="py-16 bg-white">
+      <section className="pt-8 pb-16 bg-white">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {siteConfig.facts.map((fact, i) => (
