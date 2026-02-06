@@ -179,10 +179,10 @@ export default function TermsOfServicePage() {
               <p className="text-gray-700">
                 Email:{" "}
                 <a
-                  href="mailto:info@pawsandclawsatx.com"
+                  href="mailto:info@pawsnclaws.org"
                   className="text-amber-600 hover:underline"
                 >
-                  info@pawsandclawsatx.com
+                  info@pawsnclaws.org
                 </a>
               </p>
               <p className="text-gray-700 mt-2">

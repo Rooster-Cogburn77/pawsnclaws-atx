@@ -1,20 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { emailSchema } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const { email } = body;
 
-    const parsed = emailSchema.safeParse(body?.email);
-    if (!parsed.success) {
+    if (!email || !email.includes("@")) {
       return NextResponse.json(
         { error: "Valid email is required" },
         { status: 400 }
       );
     }
 
-    const normalizedEmail = parsed.data.toLowerCase().trim();
+    const normalizedEmail = email.toLowerCase().trim();
 
     // Update subscriber status
     const { error } = await supabase

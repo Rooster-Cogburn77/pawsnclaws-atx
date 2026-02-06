@@ -53,7 +53,10 @@ export async function POST(request: Request) {
       // Log for now if DB not configured
       console.log("Colony submission received:", {
         colonyName: data.colonyName,
+        location: data.locationDescription,
         cats: data.estimatedCats,
+        submitter: data.submitterEmail,
+        urgentNeeds: data.urgentNeeds,
       });
     }
 

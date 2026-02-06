@@ -8,10 +8,10 @@ export const siteConfig = {
   tagline: "Helping Austin's Animals",
   description:
     "A community initiative connecting Austin with resources to help local animals - strays, rescues, and pets in need.",
-  url: "https://pawsandclawsatx.com",
+  url: "https://pawsnclaws.org",
 
   // Contact & social
-  email: "hello@pawsandclawsatx.com",
+  email: "hello@pawsnclaws.org", // Update when you have one
 
   // Navigation
   nav: [

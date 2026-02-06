@@ -68,6 +68,8 @@ export async function POST(request: NextRequest) {
       console.log("Lost/found report received (DB not configured):", {
         type,
         species,
+        location,
+        contactName,
       });
     }
 
@@ -95,7 +97,7 @@ export async function POST(request: NextRequest) {
         <p><strong>Contact:</strong> ${escapeHtml(contactName)}</p>
         ${contactPhone ? `<p><strong>Phone:</strong> ${escapeHtml(contactPhone)}</p>` : ''}
         ${contactEmail ? `<p><strong>Email:</strong> ${escapeHtml(contactEmail)}</p>` : ''}
-        <a href="https://pawsandclawsatx.com/lost-found" class="button">View All Reports</a>
+        <a href="https://pawsnclaws.org/lost-found" class="button">View All Reports</a>
       `),
     });
 
@@ -107,7 +109,7 @@ export async function POST(request: NextRequest) {
         html: emailTemplates.base(`
           <h2>Report Received</h2>
           <p>Hi ${escapeHtml(contactName)},</p>
-          <p>We've received your ${isLost ? "lost" : "found"} pet report and it's now visible on our <a href="https://pawsandclawsatx.com/lost-found">Lost & Found board</a>.</p>
+          <p>We've received your ${isLost ? "lost" : "found"} pet report and it's now visible on our <a href="https://pawsnclaws.org/lost-found">Lost & Found board</a>.</p>
 
           <h3>Your Report:</h3>
           <ul>

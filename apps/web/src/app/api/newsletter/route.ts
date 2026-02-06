@@ -54,22 +54,23 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  // Public endpoint - only returns count, not subscriber data
+  // Admin endpoint to get subscriber count
   try {
     const { data, error } = await supabase
       .from("newsletter_subscribers")
-      .select("id")
+      .select("*")
       .eq("status", "active");
 
     if (error) throw error;
 
     return NextResponse.json({
       count: data?.length || 0,
+      subscribers: data || [],
     });
   } catch (error) {
     console.error("Newsletter fetch error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch subscriber count" },
+      { error: "Failed to fetch subscribers" },
       { status: 500 }
     );
   }

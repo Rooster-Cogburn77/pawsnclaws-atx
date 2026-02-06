@@ -4,9 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAdminAuth } from "@/hooks";
 
-// Simple password protection - requires NEXT_PUBLIC_ADMIN_PASSWORD env var
-// TODO: Replace with server-side auth (Supabase Auth) before production use
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+// Simple password protection (replace with proper auth later)
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
 
 const dashboardItems = [
   {
@@ -106,10 +105,6 @@ export default function AdminDashboard() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!ADMIN_PASSWORD) {
-      setError("Admin access not configured. Set NEXT_PUBLIC_ADMIN_PASSWORD.");
-      return;
-    }
     if (password === ADMIN_PASSWORD) {
       login();
       setError("");

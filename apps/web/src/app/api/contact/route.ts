@@ -40,7 +40,10 @@ export async function POST(request: NextRequest) {
     } catch {
       // Log for now if DB not configured
       console.log("Contact form submission received:", {
+        name,
+        email,
         reason,
+        message: message.substring(0, 100) + "...",
       });
     }
 

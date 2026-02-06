@@ -158,10 +158,10 @@ export default function PrivacyPolicyPage() {
               <p className="text-gray-700">
                 Email:{" "}
                 <a
-                  href="mailto:privacy@pawsandclawsatx.com"
+                  href="mailto:privacy@pawsnclaws.org"
                   className="text-amber-600 hover:underline"
                 >
-                  privacy@pawsandclawsatx.com
+                  privacy@pawsnclaws.org
                 </a>
               </p>
               <p className="text-gray-700 mt-2">

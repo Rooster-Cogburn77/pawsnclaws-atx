@@ -49,5 +49,3 @@ tools/conductor/
 conductor_analysis.json
 .secrets
 .secrets
-
-.vercel

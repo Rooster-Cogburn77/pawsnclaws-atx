@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { siteConfig } from "@/data/site-config";
 import { ArrowRightIcon } from "@/components/Icons";
-
-export const metadata: Metadata = {
-  title: "PawsNClaws ATX - Helping Austin's Animals",
-  description:
-    "A community initiative connecting Austin with resources to help local animals - strays, rescues, and pets in need. TNR, foster programs, vet fund, and more.",
-};
 
 export default function Home() {
   return (

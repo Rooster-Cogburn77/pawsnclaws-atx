@@ -77,11 +77,15 @@ export default function CharlotteFosterPage() {
   });
 
   const toggleFosterType = (typeId: string) => {
-    const updated = selectedFosterTypes.includes(typeId)
+    setSelectedFosterTypes((prev) =>
+      prev.includes(typeId)
+        ? prev.filter((t) => t !== typeId)
+        : [...prev, typeId]
+    );
+    form.setValue("fosterType", selectedFosterTypes.includes(typeId)
       ? selectedFosterTypes.filter((t) => t !== typeId)
-      : [...selectedFosterTypes, typeId];
-    setSelectedFosterTypes(updated);
-    form.setValue("fosterType", updated);
+      : [...selectedFosterTypes, typeId]
+    );
   };
 
   if (form.submitSuccess) {

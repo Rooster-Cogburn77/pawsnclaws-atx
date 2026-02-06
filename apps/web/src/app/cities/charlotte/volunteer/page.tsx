@@ -69,11 +69,16 @@ export default function CharlotteVolunteerPage() {
   });
 
   const toggleRole = (roleId: string) => {
-    const updated = selectedRoles.includes(roleId)
+    setSelectedRoles((prev) =>
+      prev.includes(roleId)
+        ? prev.filter((r) => r !== roleId)
+        : [...prev, roleId]
+    );
+    // Also update form values for validation
+    form.setValue("roles", selectedRoles.includes(roleId)
       ? selectedRoles.filter((r) => r !== roleId)
-      : [...selectedRoles, roleId];
-    setSelectedRoles(updated);
-    form.setValue("roles", updated);
+      : [...selectedRoles, roleId]
+    );
   };
 
   if (form.submitSuccess) {

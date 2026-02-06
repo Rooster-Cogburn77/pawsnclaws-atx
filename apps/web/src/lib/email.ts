@@ -52,7 +52,7 @@ const templates = {
         </div>
         <div class="footer">
           <p>PawsNClaws ATX - Keeping Pets & People Together</p>
-          <p>Austin, TX | <a href="https://pawsandclawsatx.com">pawsandclawsatx.com</a></p>
+          <p>Austin, TX | <a href="https://pawsnclaws.org">pawsnclaws.org</a></p>
         </div>
       </div>
     </body>
@@ -63,7 +63,7 @@ const templates = {
   contactConfirmation: (name: string) => templates.base(`
     <h2>Thanks for reaching out, ${escapeHtml(name)}!</h2>
     <p>We've received your message and will get back to you within 24-48 hours.</p>
-    <p>In the meantime, check out our <a href="https://pawsandclawsatx.com/resources">resources</a> for helpful information.</p>
+    <p>In the meantime, check out our <a href="https://pawsnclaws.org/resources">resources</a> for helpful information.</p>
     <p>Best,<br>The PawsNClaws Team</p>
   `),
 
@@ -88,7 +88,7 @@ const templates = {
       ${roles.map(role => `<li>${escapeHtml(role)}</li>`).join('')}
     </ul>
     <p>A volunteer coordinator will reach out within the next few days to discuss next steps and answer any questions.</p>
-    <a href="https://pawsandclawsatx.com/events" class="button">View Upcoming Events</a>
+    <a href="https://pawsnclaws.org/events" class="button">View Upcoming Events</a>
   `),
 
   // Foster welcome
@@ -102,7 +102,7 @@ const templates = {
       <li>We'll schedule a brief phone orientation</li>
       <li>Once approved, you'll be added to our foster network</li>
     </ol>
-    <p>Questions? Reply to this email or visit our <a href="https://pawsandclawsatx.com/foster">foster page</a>.</p>
+    <p>Questions? Reply to this email or visit our <a href="https://pawsnclaws.org/foster">foster page</a>.</p>
   `),
 
   // Deposit assistance confirmation
@@ -139,7 +139,7 @@ const templates = {
     <p><strong>Species:</strong> ${escapeHtml(data.species)}</p>
     <p><strong>Last Seen:</strong> ${escapeHtml(data.location)}</p>
     <p><strong>Description:</strong> ${sanitizeForHtml(data.description, { preserveNewlines: true })}</p>
-    <a href="https://pawsandclawsatx.com/lost-found" class="button">View Lost & Found Board</a>
+    <a href="https://pawsnclaws.org/lost-found" class="button">View Lost & Found Board</a>
     <p style="margin-top: 20px; font-size: 14px;">If you've seen this pet, please contact the owner through our website or call Austin 311.</p>
   `),
 
@@ -150,8 +150,8 @@ const templates = {
     <p>A member of our partnerships team will reach out within 2-3 business days to discuss sponsorship opportunities.</p>
     <h3>In the meantime:</h3>
     <ul>
-      <li><a href="https://pawsandclawsatx.com/impact">View our impact</a></li>
-      <li><a href="https://pawsandclawsatx.com/stories">Read success stories</a></li>
+      <li><a href="https://pawsnclaws.org/impact">View our impact</a></li>
+      <li><a href="https://pawsnclaws.org/stories">Read success stories</a></li>
     </ul>
   `),
 
@@ -168,7 +168,7 @@ const templates = {
     </ul>
     <p style="font-size: 12px; color: #6b7280;">
       Subscribed: ${escapeHtml(email)}<br>
-      <a href="https://pawsandclawsatx.com/unsubscribe">Unsubscribe</a>
+      <a href="https://pawsnclaws.org/unsubscribe">Unsubscribe</a>
     </p>
   `),
 
@@ -185,7 +185,7 @@ const templates = {
       <p style="margin: 0;">${sanitizeForHtml(data.urgentNeeds, { preserveNewlines: true })}</p>
     </div>
     ` : ''}
-    <a href="https://pawsandclawsatx.com/admin/colonies" class="button">Review in Admin</a>
+    <a href="https://pawsnclaws.org/admin/colonies" class="button">Review in Admin</a>
   `),
 };
 
@@ -209,7 +209,7 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM || "PawsNClaws ATX <noreply@pawsandclawsatx.com>",
+        from: process.env.EMAIL_FROM || "PawsNClaws ATX <noreply@pawsnclaws.org>",
         to: Array.isArray(options.to) ? options.to : [options.to],
         subject: options.subject,
         html: options.html,
