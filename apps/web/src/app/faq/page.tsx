@@ -17,7 +17,7 @@ const faqs = [
       },
       {
         q: "How can I contact you?",
-        a: "You can reach us through our contact form at pawsnclaws.org/contact, or email us at hello@pawsnclaws.org. For emergencies involving animal safety, please call Austin 311.",
+        a: "You can reach us through our contact form at pawsandclawsatx.com/contact, or email us at hello@pawsandclawsatx.com. For emergencies involving animal safety, please call Austin 311.",
       },
     ],
   },

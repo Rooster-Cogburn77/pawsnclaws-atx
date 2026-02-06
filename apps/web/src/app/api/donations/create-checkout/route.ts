@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { z } from "zod";
+
+const checkoutSchema = z.object({
+  amount: z.number().int().min(100, "Minimum donation is $1").max(10000000, "Maximum donation is $100,000"),
+  donationType: z.enum(["one-time", "monthly"]),
+  coverFees: z.boolean().optional(),
+  donorName: z.string().max(200).optional(),
+  donorEmail: z.string().email("Invalid email").optional(),
+  message: z.string().max(500).optional(),
+  campaignId: z.string().max(100).optional(),
+});
 
 const getStripe = () => {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -14,6 +25,15 @@ const getStripe = () => {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    const result = checkoutSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.issues[0]?.message || "Invalid request" },
+        { status: 400 }
+      );
+    }
+
     const {
       amount,
       donationType,
@@ -22,14 +42,7 @@ export async function POST(request: NextRequest) {
       donorEmail,
       message,
       campaignId,
-    } = body;
-
-    if (!amount || amount < 100) {
-      return NextResponse.json(
-        { error: "Minimum donation is $1" },
-        { status: 400 }
-      );
-    }
+    } = result.data;
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 

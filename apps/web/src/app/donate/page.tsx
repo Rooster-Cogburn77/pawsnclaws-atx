@@ -258,7 +258,7 @@ export default function DonatePage() {
             {/* Trust Badges */}
             <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-500">
               <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path
                     fillRule="evenodd"
                     d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
@@ -282,30 +282,15 @@ export default function DonatePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               Other Ways to Give
             </h2>
-            <div className="grid md:grid-cols-3 gap-4">
+            <p className="text-center text-gray-600 mb-4">
+              Interested in donating stock, cryptocurrency, or through a Donor Advised Fund?
+            </p>
+            <div className="text-center">
               <a
-                href="/donate/stock"
-                className="p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow text-center"
+                href="/contact?reason=other"
+                className="inline-block px-6 py-3 border-2 border-amber-500 text-amber-600 font-medium rounded-xl hover:bg-amber-50 transition-colors"
               >
-                <span className="text-3xl mb-2 block">📈</span>
-                <h3 className="font-bold text-gray-900">Donate Stock</h3>
-                <p className="text-sm text-gray-600">Avoid capital gains tax</p>
-              </a>
-              <a
-                href="/donate/crypto"
-                className="p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow text-center"
-              >
-                <span className="text-3xl mb-2 block">₿</span>
-                <h3 className="font-bold text-gray-900">Crypto</h3>
-                <p className="text-sm text-gray-600">Bitcoin, ETH, and more</p>
-              </a>
-              <a
-                href="/donate/daf"
-                className="p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow text-center"
-              >
-                <span className="text-3xl mb-2 block">🏦</span>
-                <h3 className="font-bold text-gray-900">Donor Advised Fund</h3>
-                <p className="text-sm text-gray-600">Give from your DAF</p>
+                Contact Us for Alternative Giving Options
               </a>
             </div>
           </div>

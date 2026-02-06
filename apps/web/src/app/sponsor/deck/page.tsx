@@ -289,7 +289,7 @@ export default function SponsorDeckPage() {
           </p>
           <div className="inline-block bg-white text-gray-900 rounded-xl p-8">
             <p className="font-bold text-lg mb-2">PawsNClaws ATX</p>
-            <p className="text-gray-600 mb-1">partnerships@pawsnclaws.org</p>
+            <p className="text-gray-600 mb-1">partnerships@pawsandclawsatx.com</p>
             <p className="text-gray-600 mb-4">Austin, Texas</p>
             <p className="text-sm text-gray-500">
               EIN: 41-4047996 (501(c)(3) status pending)

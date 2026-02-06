@@ -68,8 +68,6 @@ export async function POST(request: NextRequest) {
       // This allows the form to work before DB is set up
       console.log("Sponsor inquiry received (DB not configured):", {
         companyName,
-        contactName,
-        contactEmail,
         tier,
       });
     }

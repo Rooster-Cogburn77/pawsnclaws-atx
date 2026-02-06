@@ -63,8 +63,6 @@ export async function POST(request: NextRequest) {
       }
     } catch {
       console.log("Deposit assistance application received (DB not configured):", {
-        name,
-        email,
         petName,
         depositAmount,
       });

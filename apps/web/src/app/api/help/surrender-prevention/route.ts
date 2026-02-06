@@ -79,8 +79,6 @@ export async function POST(request: NextRequest) {
       }
     } catch {
       console.log("Surrender prevention case received (DB not configured):", {
-        name,
-        phone,
         reasons,
         timeline,
       });
@@ -127,16 +125,16 @@ export async function POST(request: NextRequest) {
 
           <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h4 style="margin-top: 0;">Pet Food Assistance</h4>
-            <p>Free pet food available at <a href="https://pawsnclaws.org/food-stations">our food stations</a>.</p>
+            <p>Free pet food available at <a href="https://pawsandclawsatx.com/food-stations">our food stations</a>.</p>
 
             <h4>Emergency Vet Care</h4>
-            <p>If cost is a barrier, see our <a href="https://pawsnclaws.org/help/vet-fund">Emergency Vet Fund</a>.</p>
+            <p>If cost is a barrier, see our <a href="https://pawsandclawsatx.com/help/vet-fund">Emergency Vet Fund</a>.</p>
 
             <h4>Housing Issues</h4>
-            <p>Check out our <a href="https://pawsnclaws.org/help/deposit-assistance">Pet Deposit Assistance</a> program.</p>
+            <p>Check out our <a href="https://pawsandclawsatx.com/help/deposit-assistance">Pet Deposit Assistance</a> program.</p>
 
             <h4>Behavioral Help</h4>
-            <p>Free training resources at <a href="https://pawsnclaws.org/resources">our resources page</a>.</p>
+            <p>Free training resources at <a href="https://pawsandclawsatx.com/resources">our resources page</a>.</p>
           </div>
 
           <p style="color: #6b7280;">

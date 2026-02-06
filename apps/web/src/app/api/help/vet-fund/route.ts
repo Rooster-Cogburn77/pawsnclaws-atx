@@ -69,8 +69,6 @@ export async function POST(request: NextRequest) {
     } catch {
       // Log anyway if DB not set up
       console.log("Vet fund request received (DB not configured):", {
-        name,
-        email,
         petName,
         estimatedCost,
       });

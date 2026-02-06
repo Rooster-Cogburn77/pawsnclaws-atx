@@ -3,21 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { emails, sendEmail, emailTemplates } from "@/lib/email";
 import { escapeHtml, sanitizeForHtml } from "@/lib/sanitize";
 import { getCityBySlug } from "@/config/cities";
-import { z } from "zod";
-
-// Foster application schema
-const fosterApplicationSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(1, "Phone is required"),
-  fosterTypes: z.array(z.string()).min(1, "Please select at least one foster type"),
-  hasOtherPets: z.string().optional(),
-  hasKids: z.string().optional(),
-  housingType: z.string().optional(),
-  experience: z.string().max(5000).optional(),
-  whyFoster: z.string().max(5000).optional(),
-  city: z.string().optional(),
-});
+import { fosterSchema } from "@/lib/validations";
 
 // Map foster type IDs to readable names
 const fosterTypeLabels: Record<string, string> = {
@@ -33,7 +19,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate with Zod schema
-    const result = fosterApplicationSchema.safeParse(body);
+    const result = fosterSchema.safeParse(body);
     if (!result.success) {
       const errors: Record<string, string> = {};
       for (const error of result.error.issues) {
@@ -55,9 +41,9 @@ export async function POST(request: NextRequest) {
       housingType,
       experience,
       whyFoster,
-      city,
     } = result.data;
 
+    const city = body.city as string | undefined;
     const cityConfig = getCityBySlug(city);
     const supabase = createServerSupabase();
 
@@ -87,8 +73,6 @@ export async function POST(request: NextRequest) {
       }
     } catch {
       console.log("Foster application received (DB not configured):", {
-        name,
-        email,
         fosterTypes,
       });
     }

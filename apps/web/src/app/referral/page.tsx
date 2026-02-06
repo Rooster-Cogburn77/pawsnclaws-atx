@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function ReferralPage() {
   const [copied, setCopied] = useState(false);
   const referralCode = "PAWSFRIEND";
-  const referralLink = "https://pawsnclaws.org/?ref=friend";
+  const referralLink = "https://pawsandclawsatx.com/?ref=friend";
 
   const copyToClipboard = async (text: string) => {
     try {

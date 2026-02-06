@@ -215,7 +215,7 @@ export default function GivePage() {
             Questions about giving? We&apos;re here to help.
           </p>
           <a
-            href="mailto:giving@pawsnclaws.org"
+            href="mailto:giving@pawsandclawsatx.com"
             className="inline-block px-6 py-3 border-2 border-amber-500 text-amber-600 font-medium rounded-xl hover:bg-amber-50 transition-colors"
           >
             Contact Us About Giving
